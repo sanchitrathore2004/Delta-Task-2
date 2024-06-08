@@ -1,6 +1,14 @@
+
 let canvas = document.querySelector('canvas');
 
 let c=canvas.getContext('2d');
+
+const image = new Image();
+image.src='./zombie image.png';
+console.log(image);
+
+let adjustor=0;
+let adjustorX=0;
 
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight;
@@ -32,12 +40,16 @@ class Player{
             x:0,
             y:0
         };
+        // this.image=image;
     }
 
     draw() {
         c.beginPath();
         c.fillStyle=this.color;
         c.fillRect(this.x,this.y,this.width,this.height);
+
+        // c.drawImage(this.image,this.x,this.y);
+
     }
 
     update() {
@@ -69,7 +81,62 @@ class Platform{
         }
     }
 
-let player=new Player(canvas.width/2,canvas.height/2,50,50,'red');
+class Enemy{
+    constructor (x,y,height,width,velocity,color) {
+        this.x=x;
+        this.y=y;
+        this.height=height;
+        this.width=width;
+        this.velocity=velocity;
+        this.color=color;
+    }
+
+    draw() {
+        c.beginPath();
+        c.fillStyle=this.color;
+        c.fillRect(this.x,this.y,this.width,this.height);
+    }
+
+    update() {
+        this.draw();
+        if(this.x+this.width+adjustor>=canvas.width/4 && this.velocity.x>0){
+            this.velocity.x=0;
+            adjustor+=10+this.width;
+        }
+        else if(this.x-adjustorX<=3*canvas.width/4 && this.velocity.x<0){
+            this.velocity.x=0;
+            adjustorX+=10+this.width;
+        }
+        this.x+=this.velocity.x;
+    }
+
+}
+
+class Bullet {
+    constructor (x,y,radius,color) {
+        this.x=x;
+        this.y=y;
+        this.radius=radius;
+        this.color=color;
+    }
+
+    draw() {
+        c.beginPath();
+        c.arc(this.x,this.y,this.radius,0,Math.PI*2,false);
+        c.fillStyle=this.color;
+        c.fill();
+    }
+
+    update() {
+        //code
+    }
+}
+
+let bullets=[];
+let enemy=[];
+let enemyRight=[];
+
+let player=new Player(canvas.width/2,canvas.height/2,50,50,'red',image);
 let platform1=new Platform(canvas.width/2,canvas.height/2,20,200,'blue');
 let platform2=new Platform(canvas.width/3,canvas.height-200,200,40,'blue');
 let platform3=new Platform(2*canvas.width/3,canvas.height-200,200,40,'blue');
@@ -116,6 +183,26 @@ addEventListener('keyup', (event) => {
     }
 });
 
+
+function spawnEnemies () {
+    setInterval(()=>{
+    // console.log(enemy);
+    // console.log(enemyRight);
+    if(enemy.length>5)
+        {
+            // console.log("iske ander");
+            return;
+        }
+            enemy.push(new Enemy(0-50,canvas.height-50,50,50,{x:1,y:1},'yellow'));
+            enemyRight.push(new Enemy(canvas.width,canvas.height-50,50,50,{x:-1,y:1},'yellow'));
+    },1000);
+}
+
+function spawnBullet() {
+    setInterval(()=>{
+        bullets.push(new Bullet(canvas.width/4,canvas.height-25,10,'white'));
+    },1000);
+}
 function animate () {
     requestAnimationFrame(animate);
     c.clearRect(0,0,canvas.width,canvas.height);
@@ -123,7 +210,16 @@ function animate () {
     platform1.draw();
     platform2.draw();
     platform3.draw();
-
+    
+    // console.log(enemy);
+    for(let i=0;i<enemy.length;i++){
+        enemy[i].update();
+        enemyRight[i].update();
+    }
+    
+    for(let i=0;i<bullets.length;i++){
+        bullets[i].draw();
+    }
     if(keys.left.pressed){
         player.velocity.x=-5;
     }
@@ -154,4 +250,6 @@ function animate () {
             }
     }
 }
+spawnEnemies();
+// spawnBullet();
 animate();

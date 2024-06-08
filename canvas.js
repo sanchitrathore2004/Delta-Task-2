@@ -113,11 +113,12 @@ class Enemy{
 }
 
 class Bullet {
-    constructor (x,y,radius,color) {
+    constructor (x,y,radius,color,velocity) {
         this.x=x;
         this.y=y;
         this.radius=radius;
         this.color=color;
+        this.velocity=velocity;
     }
 
     draw() {
@@ -128,18 +129,55 @@ class Bullet {
     }
 
     update() {
-        //code
+        this.draw();
+        this.velocity.y+=gravity*0.02;
+        this.x+=this.velocity.x;
+        this.y+=this.velocity.y;
+    }
+}
+
+class PlayerBullet {
+    constructor(x,y,radius,color,velocity) {
+        this.x=x;
+        this.y=y;
+        this.radius=radius;
+        this.color=color;
+        this.velocity=velocity;
+    }
+
+    draw() {
+        c.beginPath();
+        c.arc(this.x,this.y,this.radius,0,Math.PI*2,false);
+        c.fillStyle=this.color;
+        c.fill();
+    }
+
+    update() {
+        this.draw();
+        this.x+=this.velocity.x;
+        this.y+=this.velocity.y;
     }
 }
 
 let bullets=[];
 let enemy=[];
 let enemyRight=[];
+let playerShoot=[];
 
 let player=new Player(canvas.width/2,canvas.height/2,50,50,'red',image);
 let platform1=new Platform(canvas.width/2,canvas.height/2,20,200,'blue');
 let platform2=new Platform(canvas.width/3,canvas.height-200,200,40,'blue');
 let platform3=new Platform(2*canvas.width/3,canvas.height-200,200,40,'blue');
+addEventListener('click', (event) => {
+    let angle;
+    angle=Math.atan2(event.clientY-player.y,event.clientX-player.x);
+    let speed=5;
+    let velocity={
+        x:Math.cos(angle)*speed,
+        y:Math.sin(angle)*speed
+    }
+    playerShoot.push(new PlayerBullet(player.x+25,player.y+25,10,'pink',velocity));
+})
 addEventListener('keydown', (event) => {
     let keyCode=event.keyCode;
     console.log(keyCode);
@@ -198,10 +236,34 @@ function spawnEnemies () {
     },1000);
 }
 
+let bulletPosition=[0,(canvas.width/4)-25,(canvas.width/4)-85,(canvas.width/4)-145,(canvas.width/4)-205,(canvas.width/4)-265,(canvas.width/4)-325,(3*canvas.width/4)+25,(3*canvas.width/4)+85,(3*canvas.width/4)+145,(3*canvas.width/4)+205,(3*canvas.width/4)+265,(3*canvas.width/4)+325];
+
 function spawnBullet() {
-    setInterval(()=>{
-        bullets.push(new Bullet(canvas.width/4,canvas.height-25,10,'white'));
-    },1000);
+    setInterval(() => {
+        let velocity={
+            x:null,
+            y:null
+        }
+        let index=Math.floor(((Math.random()*12)+1));
+        console.log(index);
+        if(index>6){
+            let angle = Math.random() * Math.PI/2 ; // Random angle in radians
+            let speed = 5;
+            velocity = {
+                x: -Math.cos(angle) * speed,
+                y: -Math.sin(angle) * speed
+            };    
+        }
+        else{
+            let angle = Math.random() * Math.PI/2 ; // Random angle in radians
+            let speed = 5;
+            velocity = {
+            x: Math.cos(angle) * speed,
+            y: -Math.sin(angle) * speed
+        };
+        }
+        bullets.push(new Bullet(bulletPosition[index], canvas.height - 25, 10, 'white',velocity));
+    }, 1000);
 }
 function animate () {
     requestAnimationFrame(animate);
@@ -216,10 +278,12 @@ function animate () {
         enemy[i].update();
         enemyRight[i].update();
     }
-    
     for(let i=0;i<bullets.length;i++){
-        bullets[i].draw();
+        bullets[i].update();
     }
+    playerShoot.forEach(shoot => {
+        shoot.update();
+    });
     if(keys.left.pressed){
         player.velocity.x=-5;
     }

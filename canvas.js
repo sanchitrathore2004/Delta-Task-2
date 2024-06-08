@@ -315,5 +315,5 @@ function animate () {
     }
 }
 spawnEnemies();
-// spawnBullet();
+spawnBullet();
 animate();

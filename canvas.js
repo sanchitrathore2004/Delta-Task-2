@@ -40,16 +40,12 @@ class Player{
             x:0,
             y:0
         };
-        // this.image=image;
     }
 
     draw() {
         c.beginPath();
         c.fillStyle=this.color;
         c.fillRect(this.x,this.y,this.width,this.height);
-
-        // c.drawImage(this.image,this.x,this.y);
-
     }
 
     update() {
@@ -59,8 +55,11 @@ class Player{
         if(this.y+this.height<=canvas.height){
             this.velocity.y+=gravity;
         }
-        else if(this.y+this.height>canvas.height){
+        else if(this.y+this.height>=canvas.height){
             this.velocity.y=0;
+        }
+        if(this.y<=0){
+            this.velocity.y=-this.velocity.y*0.7;
         }
     }
 }
@@ -99,14 +98,21 @@ class Enemy{
 
     update() {
         this.draw();
-        if(this.x+this.width+adjustor>=canvas.width/4 && this.velocity.x>0){
+        if(this.x+this.width>=canvas.width/9 && this.velocity.x>0){
             this.velocity.x=0;
-            adjustor+=10+this.width;
         }
-        else if(this.x-adjustorX<=3*canvas.width/4 && this.velocity.x<0){
+        if(this.y+this.height+adjustor<=5*canvas.height/6 && this.x<canvas.width/2){
+            this.velocity.y=0;
+            adjustor+=10+this.height;
+        }
+        if(this.x<=8*canvas.width/9 && this.velocity.x<0){
             this.velocity.x=0;
-            adjustorX+=10+this.width;
         }
+        if(this.y+this.height+adjustorX<=5*canvas.height/6 && this.x>canvas.width/2){
+            this.velocity.y=0;
+            adjustorX+=10+this.height;
+        }
+        this.y+=this.velocity.y;
         this.x+=this.velocity.x;
     }
 
@@ -130,9 +136,7 @@ class Bullet {
 
     update() {
         this.draw();
-        this.velocity.y+=gravity*0.02;
         this.x+=this.velocity.x;
-        this.y+=this.velocity.y;
     }
 }
 
@@ -154,6 +158,7 @@ class PlayerBullet {
 
     update() {
         this.draw();
+        this.velocity.y+=gravity*0.2;
         this.x+=this.velocity.x;
         this.y+=this.velocity.y;
     }
@@ -168,10 +173,30 @@ let player=new Player(canvas.width/2,canvas.height/2,50,50,'red',image);
 let platform1=new Platform(canvas.width/2,canvas.height/2,20,200,'blue');
 let platform2=new Platform(canvas.width/3,canvas.height-200,200,40,'blue');
 let platform3=new Platform(2*canvas.width/3,canvas.height-200,200,40,'blue');
+let platform4=new Platform(canvas.width/3-100,canvas.height-200-100,100,100,'pink');
+let platform5=new Platform(canvas.width/3,canvas.height-200-100,100,100,'aqua');
+let platform6=new Platform(canvas.width/3-200,canvas.height-200-100,100,100,'purple');
+let platform7=new Platform(canvas.width/3+100,canvas.height-200-100,100,100,'chocolate');
+let platform8=new Platform(canvas.width/3-50,canvas.height-400,100,100,'wheat');
+let platform9=new Platform(canvas.width/3-150,canvas.height-400,100,100,'gold');
+let platform10=new Platform(canvas.width/3+50,canvas.height-400,100,100,'silver');
+let platform11=new Platform(canvas.width/3,canvas.height-500,100,100,'green');
+let platform12=new Platform(canvas.width/3-100,canvas.height-500,100,100,'violet');
+let platform13=new Platform(canvas.width/3-50,canvas.height-600,100,100,'orange');
+let platform14=new Platform(2*canvas.width/3-100,canvas.height-200-100,100,100,'pink');
+let platform15=new Platform(2*canvas.width/3,canvas.height-200-100,100,100,'aqua');
+let platform16=new Platform(2*canvas.width/3-200,canvas.height-200-100,100,100,'purple');
+let platform17=new Platform(2*canvas.width/3+100,canvas.height-200-100,100,100,'chocolate');
+let platform18=new Platform(2*canvas.width/3-50,canvas.height-400,100,100,'wheat');
+let platform19=new Platform(2*canvas.width/3-150,canvas.height-400,100,100,'gold');
+let platform20=new Platform(2*canvas.width/3+50,canvas.height-400,100,100,'silver');
+let platform21=new Platform(2*canvas.width/3,canvas.height-500,100,100,'green');
+let platform22=new Platform(2*canvas.width/3-100,canvas.height-500,100,100,'violet');
+let platform23=new Platform(2*canvas.width/3-50,canvas.height-600,100,100,'orange');
 addEventListener('click', (event) => {
     let angle;
     angle=Math.atan2(event.clientY-player.y,event.clientX-player.x);
-    let speed=5;
+    let speed=10;
     let velocity={
         x:Math.cos(angle)*speed,
         y:Math.sin(angle)*speed
@@ -224,56 +249,86 @@ addEventListener('keyup', (event) => {
 
 function spawnEnemies () {
     setInterval(()=>{
-    // console.log(enemy);
-    // console.log(enemyRight);
     if(enemy.length>5)
         {
-            // console.log("iske ander");
             return;
         }
-            enemy.push(new Enemy(0-50,canvas.height-50,50,50,{x:1,y:1},'yellow'));
-            enemyRight.push(new Enemy(canvas.width,canvas.height-50,50,50,{x:-1,y:1},'yellow'));
+            enemy.push(new Enemy(0-50,canvas.height-50,50,50,{x:1,y:-1},'yellow'));
+            enemyRight.push(new Enemy(canvas.width,canvas.height-50,50,50,{x:-1,y:-1},'yellow'));
     },1000);
 }
 
-let bulletPosition=[0,(canvas.width/4)-25,(canvas.width/4)-85,(canvas.width/4)-145,(canvas.width/4)-205,(canvas.width/4)-265,(canvas.width/4)-325,(3*canvas.width/4)+25,(3*canvas.width/4)+85,(3*canvas.width/4)+145,(3*canvas.width/4)+205,(3*canvas.width/4)+265,(3*canvas.width/4)+325];
+let bulletPosition=[0,(5*canvas.height/6)-25,(5*canvas.height/6)-85,(5*canvas.height/6)-145,(5*canvas.height/6)-195,(5*canvas.height/6)-255,(5*canvas.height/6)-315];
 
 function spawnBullet() {
     setInterval(() => {
+        let speed=5;
         let velocity={
             x:null,
             y:null
         }
-        let index=Math.floor(((Math.random()*12)+1));
+        let xPoint;
+        let index=Math.floor(((Math.random()*6)+1));
         console.log(index);
-        if(index>6){
-            let angle = Math.random() * Math.PI/2 ; // Random angle in radians
-            let speed = 5;
-            velocity = {
-                x: -Math.cos(angle) * speed,
-                y: -Math.sin(angle) * speed
-            };    
+        let side;
+        side=Math.random()*10;
+        if(side>5){
+              velocity={
+                x:-1*speed,
+                y:null
+              } 
+              xPoint=8*canvas.width/9;
         }
         else{
-            let angle = Math.random() * Math.PI/2 ; // Random angle in radians
-            let speed = 5;
-            velocity = {
-            x: Math.cos(angle) * speed,
-            y: -Math.sin(angle) * speed
-        };
+              velocity={
+                x:1*speed,
+                y:null
+              }
+              xPoint=canvas.width/9
         }
-        bullets.push(new Bullet(bulletPosition[index], canvas.height - 25, 10, 'white',velocity));
+        bullets.push(new Bullet(xPoint, bulletPosition[index], 10, 'white',velocity));
     }, 1000);
 }
+
+function playerBlockCollision () {
+    // console.log('function hit');
+    if(player.x<=(canvas.width/3)+200 && player.y+player.height<=canvas.height-300 && player.x+player.width>=(canvas.width/3)-200){
+        // console.log('condition hit');
+        player.velocity.y=0;
+    }
+    // if(player.x+player.width>=(2*canvas.width/3)-200 && player.x<=(2*canvas.width/3)+100 && player.y+player.height<=canvas.height>=canvas.height-300){
+    //     player.velocity.y=0;
+    // }
+}
+
 function animate () {
     requestAnimationFrame(animate);
     c.clearRect(0,0,canvas.width,canvas.height);
-    player.update();
     platform1.draw();
     platform2.draw();
     platform3.draw();
-    
-    // console.log(enemy);
+    platform4.draw();
+    platform5.draw();
+    platform6.draw();
+    platform7.draw();
+    platform8.draw();
+    platform9.draw();
+    platform10.draw();
+    platform11.draw();
+    platform12.draw();
+    platform13.draw();
+    platform14.draw();
+    platform15.draw();
+    platform16.draw();
+    platform17.draw();
+    platform18.draw();
+    platform19.draw();
+    platform20.draw();
+    platform21.draw();
+    platform22.draw();
+    platform23.draw();
+    player.update();
+
     for(let i=0;i<enemy.length;i++){
         enemy[i].update();
         enemyRight[i].update();
@@ -313,7 +368,8 @@ function animate () {
                 player.velocity.x=-5;
             }
     }
+    playerBlockCollision();
 }
 spawnEnemies();
-spawnBullet();
+// spawnBullet();
 animate();

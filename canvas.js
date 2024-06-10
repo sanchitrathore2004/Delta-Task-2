@@ -193,6 +193,13 @@ let platform20=new Platform(2*canvas.width/3+50,canvas.height-400,100,100,'silve
 let platform21=new Platform(2*canvas.width/3,canvas.height-500,100,100,'green');
 let platform22=new Platform(2*canvas.width/3-100,canvas.height-500,100,100,'violet');
 let platform23=new Platform(2*canvas.width/3-50,canvas.height-600,100,100,'orange');
+
+let platforms=[];
+for(let i=4;i<=23;i++){
+    platforms[i-4]=eval(`platform${i}`);
+}
+console.log(platforms);
+
 addEventListener('click', (event) => {
     let angle;
     angle=Math.atan2(event.clientY-player.y,event.clientX-player.x);
@@ -290,15 +297,47 @@ function spawnBullet() {
     }, 1000);
 }
 
+function zombieBulletToObstacle() {
+    bullets.forEach((bullet,bullIndex) => {
+        platforms.forEach((plat,platIndex) => {
+            if(bullet.x+bullet.radius>=plat.x && (bullet.y+bullet.radius>=plat.y || bullet.y-bullet.radius<=plat.y+plat.height)){
+                // console.log('aaya ander');
+                platforms.splice(platIndex,1);
+                bullets.splice(bullIndex,1);
+            }
+        })
+    })
+}
+
 function playerBlockCollision () {
-    // console.log('function hit');
-    if(player.x<=(canvas.width/3)+200 && player.y+player.height<=canvas.height-300 && player.x+player.width>=(canvas.width/3)-200){
-        // console.log('condition hit');
+    if(player.x<=(canvas.width/3)+200 && player.y+player.height+player.velocity.y<=canvas.height-300 && player.x+player.width>=(canvas.width/3)-200 && player.y+player.height+player.velocity.y*3>=canvas.height-300){
+        console.log('condition hit');
         player.velocity.y=0;
     }
-    // if(player.x+player.width>=(2*canvas.width/3)-200 && player.x<=(2*canvas.width/3)+100 && player.y+player.height<=canvas.height>=canvas.height-300){
-    //     player.velocity.y=0;
-    // }
+    if(player.x+player.width>=(2*canvas.width/3)-200 && player.x<=(2*canvas.width/3)+200 && player.y+player.height<=canvas.height-300 && player.y+player.height+player.velocity.y*3>=canvas.height-300){
+        player.velocity.y=0;
+    }
+    if(player.x+player.width>=(2*canvas.width/3)-150 && player.x<=(2*canvas.width/3)+150 && player.y+player.height<=canvas.height-400 && player.y+player.height+player.velocity.y*3>=canvas.height-400){
+        player.velocity.y=0;
+    }
+    if(player.x<=(canvas.width/3)+150 && player.y+player.height+player.velocity.y<=canvas.height-400 && player.x+player.width>=(canvas.width/3)-150 && player.y+player.height+player.velocity.y*3>=canvas.height-400){
+        console.log('condition hit');
+        player.velocity.y=0;
+    }
+    if(player.x<=(canvas.width/3)+100 && player.y+player.height+player.velocity.y<=canvas.height-500 && player.x+player.width>=(canvas.width/3)-100 && player.y+player.height+player.velocity.y*3>=canvas.height-500){
+        console.log('condition hit');
+        player.velocity.y=0;
+    }
+    if(player.x+player.width>=(2*canvas.width/3)-100 && player.x<=(2*canvas.width/3)+100 && player.y+player.height<=canvas.height-500 && player.y+player.height+player.velocity.y*3>=canvas.height-500){
+        player.velocity.y=0;
+    }
+    if(player.x+player.width>=(2*canvas.width/3)-50 && player.x<=(2*canvas.width/3)+50 && player.y+player.height<=canvas.height-600 && player.y+player.height+player.velocity.y*3>=canvas.height-600){
+        player.velocity.y=0;
+    }
+    if(player.x<=(canvas.width/3)+50 && player.y+player.height+player.velocity.y<=canvas.height-600 && player.x+player.width>=(canvas.width/3)-50 && player.y+player.height+player.velocity.y*3>=canvas.height-600){
+        console.log('condition hit');
+        player.velocity.y=0;
+    }
 }
 
 function animate () {
@@ -307,26 +346,11 @@ function animate () {
     platform1.draw();
     platform2.draw();
     platform3.draw();
-    platform4.draw();
-    platform5.draw();
-    platform6.draw();
-    platform7.draw();
-    platform8.draw();
-    platform9.draw();
-    platform10.draw();
-    platform11.draw();
-    platform12.draw();
-    platform13.draw();
-    platform14.draw();
-    platform15.draw();
-    platform16.draw();
-    platform17.draw();
-    platform18.draw();
-    platform19.draw();
-    platform20.draw();
-    platform21.draw();
-    platform22.draw();
-    platform23.draw();
+    for(let i=0;i<20;i++){
+        if(platforms[i]){
+        platforms[i].draw();
+    }
+    }
     player.update();
 
     for(let i=0;i<enemy.length;i++){
@@ -368,8 +392,14 @@ function animate () {
                 player.velocity.x=-5;
             }
     }
+    bullets.forEach((bull,bullIndex) => {
+        if(bull.x>=canvas.width || bull.x<0){
+            bullets.splice(bullIndex,1);
+        }
+    })
     playerBlockCollision();
+    // zombieBulletToObstacle();
 }
 spawnEnemies();
-// spawnBullet();
+spawnBullet();
 animate();

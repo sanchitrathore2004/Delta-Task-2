@@ -1,3 +1,5 @@
+live website ----- https://sanchitrathore2004.github.io/Delta-Task-2/
+
 game setup
 player making
 player movement
@@ -8,8 +10,9 @@ colouring of the game
 game ui
 
 
-
-make blocks that will be destroyed by the zombie bullets  
-zombie bullet in x axis only no gravity ---- done
-player ki ek health hogi jo dikhegi
-player ki bullet me gravity lgao ---- done
+player ki bullet se zombie maaro
+zombie ki bullet se obstacle htao
+player health bnao
+zombie ki bullet se player health kam kro
+zombie aage move honge aur player health kam krenge usko touch krke
+scoring system bnao

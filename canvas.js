@@ -9,9 +9,12 @@ console.log(image);
 
 let adjustor=0;
 let adjustorX=0;
+let flag=false;
+let points=document.querySelector("#point");
+let setScore=0;
 
 canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
+canvas.height=window.innerHeight-50;
 
 window.addEventListener('resize', () => {
     canvas.width=innerWidth;
@@ -256,12 +259,16 @@ addEventListener('keyup', (event) => {
 
 function spawnEnemies () {
     setInterval(()=>{
-    if(enemy.length>5)
+    if(enemy.length<=8)
         {
-            return;
+            enemy.push(new Enemy(0-50,canvas.height-50,50,50,{x:3,y:-3},'yellow'));
         }
-            enemy.push(new Enemy(0-50,canvas.height-50,50,50,{x:1,y:-1},'yellow'));
-            enemyRight.push(new Enemy(canvas.width,canvas.height-50,50,50,{x:-1,y:-1},'yellow'));
+    else if(enemyRight.length<=8){
+        enemyRight.push(new Enemy(canvas.width,canvas.height-50,50,50,{x:-3,y:-3},'yellow'));
+    }
+    else{
+        return;
+    } 
     },1000);
 }
 
@@ -309,9 +316,31 @@ function zombieBulletToObstacle() {
     })
 }
 
+function playerBulletToZombie () {
+    playerShoot.forEach((shoot,index) => {
+        enemy.forEach((e,eIndex) => {
+            if(shoot.x-shoot.radius<=e.x+e.width && (shoot.y+shoot.radius>=e.y || shoot.y-shoot.radius>=e.y+e.height) && (shoot.y+shoot.radius<=e.y+100 || shoot.y-shoot.radius<=e.y+e.height-100)){
+                playerShoot.splice(index,1);
+                enemy.splice(eIndex,1);
+                setScore+=100;
+                points.innerHTML=setScore;
+            }
+        });
+        enemyRight.forEach((er,erIndex) => {
+            if(shoot.x+shoot.radius>=er.x && (shoot.y+shoot.radius>=er.y || shoot.y-shoot.radius>=er.y+er.height) && (shoot.y+shoot.radius<=er.y+100 || shoot.y-shoot.radius<=er.y+er.height-100)){
+                console.log('condition hit bhai vahi vali');
+                playerShoot.splice(index,1);
+                enemyRight.splice(erIndex,1);
+                setScore+=100;
+                points.innerHTML=setScore;
+            }
+        });
+    });
+}
+
 function playerBlockCollision () {
     if(player.x<=(canvas.width/3)+200 && player.y+player.height+player.velocity.y<=canvas.height-300 && player.x+player.width>=(canvas.width/3)-200 && player.y+player.height+player.velocity.y*3>=canvas.height-300){
-        console.log('condition hit');
+        // console.log('condition hit');
         player.velocity.y=0;
     }
     if(player.x+player.width>=(2*canvas.width/3)-200 && player.x<=(2*canvas.width/3)+200 && player.y+player.height<=canvas.height-300 && player.y+player.height+player.velocity.y*3>=canvas.height-300){
@@ -321,11 +350,11 @@ function playerBlockCollision () {
         player.velocity.y=0;
     }
     if(player.x<=(canvas.width/3)+150 && player.y+player.height+player.velocity.y<=canvas.height-400 && player.x+player.width>=(canvas.width/3)-150 && player.y+player.height+player.velocity.y*3>=canvas.height-400){
-        console.log('condition hit');
+        // console.log('condition hit');
         player.velocity.y=0;
     }
     if(player.x<=(canvas.width/3)+100 && player.y+player.height+player.velocity.y<=canvas.height-500 && player.x+player.width>=(canvas.width/3)-100 && player.y+player.height+player.velocity.y*3>=canvas.height-500){
-        console.log('condition hit');
+        // console.log('condition hit');
         player.velocity.y=0;
     }
     if(player.x+player.width>=(2*canvas.width/3)-100 && player.x<=(2*canvas.width/3)+100 && player.y+player.height<=canvas.height-500 && player.y+player.height+player.velocity.y*3>=canvas.height-500){
@@ -335,7 +364,7 @@ function playerBlockCollision () {
         player.velocity.y=0;
     }
     if(player.x<=(canvas.width/3)+50 && player.y+player.height+player.velocity.y<=canvas.height-600 && player.x+player.width>=(canvas.width/3)-50 && player.y+player.height+player.velocity.y*3>=canvas.height-600){
-        console.log('condition hit');
+        // console.log('condition hit');
         player.velocity.y=0;
     }
 }
@@ -355,6 +384,8 @@ function animate () {
 
     for(let i=0;i<enemy.length;i++){
         enemy[i].update();
+    }
+    for(let i=0;i<enemyRight.length;i++){
         enemyRight[i].update();
     }
     for(let i=0;i<bullets.length;i++){
@@ -396,8 +427,14 @@ function animate () {
         if(bull.x>=canvas.width || bull.x<0){
             bullets.splice(bullIndex,1);
         }
-    })
+    });
+    playerShoot.forEach((shoot,index) => {
+        if(shoot.x>=canvas.width || shoot.x<=0 || shoot.y>=canvas.height || shoot.y<=0){
+            playerShoot.splice(index,1);
+        }
+    });
     playerBlockCollision();
+    playerBulletToZombie();
     // zombieBulletToObstacle();
 }
 spawnEnemies();

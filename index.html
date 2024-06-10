@@ -9,9 +9,26 @@
             margin: 0;
             background-color: black;
         }
+        .all{
+            display: flex;
+            padding: 5px;
+            justify-content: space-between;
+            /* position: absolute; */
+        }
+        .score,
+        .health{
+            color: white;
+            /* position: absolute; */
+            font-size: x-large;
+            font-weight: bold;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            user-select: none;
+        }
     </style>
 </head>
-<body>
+<body><div class="all">
+    <div class="score">SCORE : <span id="point">0</span></div> <div class="health">HEALTH : <span id="health-status">100%</span></div>
+</div>
     <canvas></canvas>
     <script type="module" src="canvas.js"></script>
 </body>

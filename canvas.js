@@ -12,6 +12,8 @@ let adjustorX=0;
 let flag=false;
 let points=document.querySelector("#point");
 let setScore=0;
+let healthStatus=document.querySelector("#health-status");
+let healthScore=100;
 
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight-50;
@@ -307,13 +309,47 @@ function spawnBullet() {
 function zombieBulletToObstacle() {
     bullets.forEach((bullet,bullIndex) => {
         platforms.forEach((plat,platIndex) => {
-            if(bullet.x+bullet.radius>=plat.x && (bullet.y+bullet.radius>=plat.y || bullet.y-bullet.radius<=plat.y+plat.height)){
-                // console.log('aaya ander');
-                platforms.splice(platIndex,1);
-                bullets.splice(bullIndex,1);
+            if(bullet.velocity.x>0){
+                if(bullet.x+bullet.radius>=plat.x && bullet.x-bullet.radius<=plat.x+plat.width && bullet.y+bullet.radius>=plat.y && bullet.y-bullet.radius<=plat.y+plat.height){
+                    bullets.splice(bullIndex,1);
+                    platforms.splice(platIndex,1);
+                }
             }
-        })
-    })
+            else if(bullet.velocity.x<0){
+                if(bullet.x-bullet.radius<=plat.x+plat.width && bullet.x+bullet.radius>=plat.x && bullet.y+bullet.radius>=plat.y && bullet.y-bullet.radius<=plat.y+plat.height){
+                    bullets.splice(bullIndex,1);
+                    platforms.splice(platIndex,1);
+                }
+            }
+        });
+    });
+}
+
+function zombieBulletToPlayer () {
+    bullets.forEach((b,index) => {
+        if(b.velocity.x>0){
+        if(b.x+b.radius>=player.x && b.x-b.radius<=player.x+player.width && b.y+b.radius>=player.y && b.y-b.radius<=player.y+player.height){
+            bullets.splice(index,1);
+            healthScore-=25;
+            healthStatus.innerHTML=`${healthScore}%`;
+            cancelAnimationFrame(animate);
+            if(healthScore==0){
+            alert('Game over');
+        }
+        }
+    }
+    else{
+        if(b.x-b.radius<=player.x+player.width && b.x+b.radius>=player.x-player.width && b.y+b.radius>=player.y && b.y-b.radius<=player.y+player.height){
+            bullets.splice(index,1);
+            healthScore-=25;
+            healthStatus.innerHTML=`${healthScore}%`;
+            cancelAnimationFrame(animate);
+            if(healthScore==0){
+            alert('Game over');
+        }
+        }
+    }
+    });
 }
 
 function playerBulletToZombie () {
@@ -435,7 +471,8 @@ function animate () {
     });
     playerBlockCollision();
     playerBulletToZombie();
-    // zombieBulletToObstacle();
+    zombieBulletToPlayer();
+    zombieBulletToObstacle();
 }
 spawnEnemies();
 spawnBullet();

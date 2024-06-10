@@ -10,9 +10,11 @@ colouring of the game
 game ui
 
 
-player ki bullet se zombie maaro
-zombie ki bullet se obstacle htao
-player health bnao
-zombie ki bullet se player health kam kro
+player ki bullet se zombie maaro ---- doneeee
+zombie re render krao
+zombie ki bullet se obstacle htao ------ doneeee
+player health bnao ---- doneeeee
+zombie ki bullet se player health kam kro----doneeee
 zombie aage move honge aur player health kam krenge usko touch krke
 scoring system bnao ---- doneeee
+agr obstacles hat gae to phir player uspe nahi chad skta --- platforms array ka use kro collision detect krne ke liye

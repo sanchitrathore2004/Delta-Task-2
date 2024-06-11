@@ -17,7 +17,7 @@ let healthScore=100;
 let reRenderZombie=[];
 let timer=document.querySelector("#time-left");
 let timeText=document.querySelector(".timer");
-let timeLeft=120;
+let timeLeft=12;
 
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight-50;
@@ -183,6 +183,33 @@ class PlayerBullet {
     update() {
         this.draw();
         this.velocity.y+=gravity*0.2;
+        this.x+=this.velocity.x;
+        this.y+=this.velocity.y;
+    }
+}
+
+class Zombies {
+    constructor (x,y,width,height,velocity,color) {
+        this.x=x;
+        this.y=y;
+        this.width=width;
+        this.height=height;
+        this.velocity=velocity;
+        this.color=color;
+    }
+    draw () {
+        c.beginPath();
+        c.fillStyle=this.color;
+        c.fillRect(this.x,this.y,this.width,this.height);
+    }
+    update () {
+        this.draw();
+        if(this.y<=0 || this.y+this.height>=canvas.height){
+            this.velocity.y=-this.velocity.y;
+        }
+        if(this.x<=0 || this.x+this.width>=canvas.width){
+            this.velocity.x=-this.velocity.x;
+        }
         this.x+=this.velocity.x;
         this.y+=this.velocity.y;
     }
@@ -459,7 +486,29 @@ function playerBlockCollision () {
 }
 
 function movingZombies () {
-    
+    setInterval(() => {
+        let xPoint=[0+10,canvas.width-110];
+        let xCheck=Math.floor(Math.random()*2);
+        let yPoint=Math.random()*canvas.height;
+        let speed=4;
+        let velocity={
+            x:null,
+            y:null
+        }
+        if(xCheck==0){
+            velocity={
+                x:Math.random()*speed,
+                y:-Math.random()*speed
+            }
+        }
+        else if(xCheck==1){
+            velocity={
+                x:-Math.random()*speed,
+                y:Math.random()*speed
+            }
+        }
+        arrivingZombies.push(new Zombies(xPoint[xCheck],yPoint,50,50,velocity,'orange'));
+    },1000);
 }
 
 function timerFunction () {
@@ -470,9 +519,21 @@ function timerFunction () {
             timeText.innerHTML="ZOMBIES ARE ARRIVING";
             enemy=[];
             enemyRight=[];
+            movingZombies();
             return;
         }
     }, 1000);
+}
+
+function playerBulletToMovingZombie () {
+    playerShoot.forEach((shoot,index)=>{
+        arrivingZombies.forEach((zombie,zIndex)=>{
+            if(shoot.x-shoot.radius<=zombie.x+zombie.width && (shoot.y+shoot.radius>=zombie.y || shoot.y-shoot.radius>=zombie.y+zombie.height) && (shoot.y+shoot.radius<=zombie.y+100 || shoot.y-shoot.radius<=zombie.y+zombie.height-100)){
+                playerShoot.splice(index,1);
+                arrivingZombies.splice(zIndex,1);
+            }
+        });
+    });
 }
 
 function animate () {
@@ -499,6 +560,12 @@ function animate () {
     playerShoot.forEach(shoot => {
         shoot.update();
     });
+    for(let i=0;i<arrivingZombies.length;i++){
+        if(arrivingZombies[i]){
+            arrivingZombies[i].update();
+            playerBulletToMovingZombie();
+        }
+    }
     if(keys.left.pressed){
         player.velocity.x=-5;
     }

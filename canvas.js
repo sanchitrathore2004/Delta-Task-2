@@ -9,11 +9,12 @@ console.log(image);
 
 let adjustor=0;
 let adjustorX=0;
-let flag=false;
+let flag=true;
 let points=document.querySelector("#point");
 let setScore=0;
 let healthStatus=document.querySelector("#health-status");
 let healthScore=100;
+let reRenderZombie=[];
 
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight-50;
@@ -103,24 +104,39 @@ class Enemy{
 
     update() {
         this.draw();
-        if(this.x+this.width>=canvas.width/9 && this.velocity.x>0){
+        if(flag){
+        if(this.x+this.width>=this.width && this.velocity.x>0){
             this.velocity.x=0;
         }
-        if(this.y+this.height+adjustor<=5*canvas.height/6 && this.x<canvas.width/2){
+        if(this.y+this.height+adjustor<=14*canvas.height/15 && this.x<canvas.width/2){
             this.velocity.y=0;
-            adjustor+=10+this.height;
+            adjustor+=20+this.height;
         }
-        if(this.x<=8*canvas.width/9 && this.velocity.x<0){
+        if(this.x+this.width<=canvas.width && this.velocity.x<0){
             this.velocity.x=0;
         }
-        if(this.y+this.height+adjustorX<=5*canvas.height/6 && this.x>canvas.width/2){
+        if(this.y+this.height+adjustorX<=14*canvas.height/15 && this.x>canvas.width/2){
             this.velocity.y=0;
-            adjustorX+=10+this.height;
+            adjustorX+=20+this.height;
         }
         this.y+=this.velocity.y;
         this.x+=this.velocity.x;
     }
-
+    else if (!flag){
+        // console.log(reRenderZombie.slice(-1)[0]);
+        if(this.x>=reRenderZombie.slice(-1)[0].x && this.velocity.x>0){
+            this.velocity.x=0;
+        }
+        if(this.y<=reRenderZombie.slice(-1)[0].y){
+            this.velocity.y=0;
+        }
+        if(this.x<=reRenderZombie.slice(-1)[0].x && this.velocity.x<0){
+            this.velocity.x=0;
+        }
+        this.y+=this.velocity.y;
+        this.x+=this.velocity.x;
+    }
+}
 }
 
 class Bullet {
@@ -175,7 +191,7 @@ let enemyRight=[];
 let playerShoot=[];
 
 let player=new Player(canvas.width/2,canvas.height/2,50,50,'red',image);
-let platform1=new Platform(canvas.width/2,canvas.height/2,20,200,'blue');
+let platform1=new Platform(canvas.width/2,4*canvas.height/5,20,200,'blue');
 let platform2=new Platform(canvas.width/3,canvas.height-200,200,40,'blue');
 let platform3=new Platform(2*canvas.width/3,canvas.height-200,200,40,'blue');
 let platform4=new Platform(canvas.width/3-100,canvas.height-200-100,100,100,'pink');
@@ -258,15 +274,18 @@ addEventListener('keyup', (event) => {
     }
 });
 
+let bulletPosition=[];
 
 function spawnEnemies () {
     setInterval(()=>{
     if(enemy.length<=8)
         {
             enemy.push(new Enemy(0-50,canvas.height-50,50,50,{x:3,y:-3},'yellow'));
+            bulletPosition.push(enemy.slice(-1)[0]);
         }
     else if(enemyRight.length<=8){
         enemyRight.push(new Enemy(canvas.width,canvas.height-50,50,50,{x:-3,y:-3},'yellow'));
+        bulletPosition.push(enemyRight.slice(-1)[0]);
     }
     else{
         return;
@@ -274,7 +293,7 @@ function spawnEnemies () {
     },1000);
 }
 
-let bulletPosition=[0,(5*canvas.height/6)-25,(5*canvas.height/6)-85,(5*canvas.height/6)-145,(5*canvas.height/6)-195,(5*canvas.height/6)-255,(5*canvas.height/6)-315];
+// let bulletPosition=[0,(5*canvas.height/6)-25,(5*canvas.height/6)-85,(5*canvas.height/6)-145,(5*canvas.height/6)-195,(5*canvas.height/6)-255,(5*canvas.height/6)-315];
 
 function spawnBullet() {
     setInterval(() => {
@@ -284,27 +303,23 @@ function spawnBullet() {
             y:null
         }
         let xPoint;
-        let index=Math.floor(((Math.random()*6)+1));
+        let index=Math.floor(((Math.random()*18)));
         console.log(index);
-        let side;
-        side=Math.random()*10;
-        if(side>5){
+        if(bulletPosition[index].x>canvas.width/2){
               velocity={
                 x:-1*speed,
                 y:null
               } 
-              xPoint=8*canvas.width/9;
         }
         else{
               velocity={
                 x:1*speed,
                 y:null
               }
-              xPoint=canvas.width/9
         }
-        bullets.push(new Bullet(xPoint, bulletPosition[index], 10, 'white',velocity));
+        bullets.push(new Bullet(bulletPosition[index].x+bulletPosition[index].width, bulletPosition[index].y+bulletPosition[index].height, 10, 'white',velocity));
     }, 1000);
-}
+    }
 
 function zombieBulletToObstacle() {
     bullets.forEach((bullet,bullIndex) => {
@@ -312,13 +327,21 @@ function zombieBulletToObstacle() {
             if(bullet.velocity.x>0){
                 if(bullet.x+bullet.radius>=plat.x && bullet.x-bullet.radius<=plat.x+plat.width && bullet.y+bullet.radius>=plat.y && bullet.y-bullet.radius<=plat.y+plat.height){
                     bullets.splice(bullIndex,1);
-                    platforms.splice(platIndex,1);
+                    plat.height-=33.33;
+                    plat.width-=33.33;
+                    if(plat.height<=1 && plat.width<=10){
+                        platforms.splice(platIndex,1);
+                    }
                 }
             }
             else if(bullet.velocity.x<0){
                 if(bullet.x-bullet.radius<=plat.x+plat.width && bullet.x+bullet.radius>=plat.x && bullet.y+bullet.radius>=plat.y && bullet.y-bullet.radius<=plat.y+plat.height){
                     bullets.splice(bullIndex,1);
-                    platforms.splice(platIndex,1);
+                    plat.height-=33.33;
+                    plat.width-=33.33;
+                    if(plat.height<=1 && plat.width<=1){
+                        platforms.splice(platIndex,1);
+                    }
                 }
             }
         });
@@ -357,45 +380,68 @@ function playerBulletToZombie () {
         enemy.forEach((e,eIndex) => {
             if(shoot.x-shoot.radius<=e.x+e.width && (shoot.y+shoot.radius>=e.y || shoot.y-shoot.radius>=e.y+e.height) && (shoot.y+shoot.radius<=e.y+100 || shoot.y-shoot.radius<=e.y+e.height-100)){
                 playerShoot.splice(index,1);
+                reRenderZombie.push(new Enemy(e.x,e.y,e.height,e.width,e.velocity,e.color));
                 enemy.splice(eIndex,1);
                 setScore+=100;
                 points.innerHTML=setScore;
+                flag=false;
             }
         });
         enemyRight.forEach((er,erIndex) => {
             if(shoot.x+shoot.radius>=er.x && (shoot.y+shoot.radius>=er.y || shoot.y-shoot.radius>=er.y+er.height) && (shoot.y+shoot.radius<=er.y+100 || shoot.y-shoot.radius<=er.y+er.height-100)){
                 console.log('condition hit bhai vahi vali');
                 playerShoot.splice(index,1);
+                reRenderZombie.push(new Enemy(er.x,er.y,er.height,er.width,er.velocity,er.color));
                 enemyRight.splice(erIndex,1);
                 setScore+=100;
                 points.innerHTML=setScore;
+                flag=false;
             }
         });
     });
+    // console.log(reRenderZombie);
 }
 
+
+
 function playerBlockCollision () {
-    if(player.x<=(canvas.width/3)+200 && player.y+player.height+player.velocity.y<=canvas.height-300 && player.x+player.width>=(canvas.width/3)-200 && player.y+player.height+player.velocity.y*3>=canvas.height-300){
-        // console.log('condition hit');
-        player.velocity.y=0;
-    }
-    if(player.x+player.width>=(2*canvas.width/3)-200 && player.x<=(2*canvas.width/3)+200 && player.y+player.height<=canvas.height-300 && player.y+player.height+player.velocity.y*3>=canvas.height-300){
-        player.velocity.y=0;
-    }
-    if(player.x+player.width>=(2*canvas.width/3)-150 && player.x<=(2*canvas.width/3)+150 && player.y+player.height<=canvas.height-400 && player.y+player.height+player.velocity.y*3>=canvas.height-400){
-        player.velocity.y=0;
-    }
-    if(player.x<=(canvas.width/3)+150 && player.y+player.height+player.velocity.y<=canvas.height-400 && player.x+player.width>=(canvas.width/3)-150 && player.y+player.height+player.velocity.y*3>=canvas.height-400){
-        // console.log('condition hit');
-        player.velocity.y=0;
-    }
-    if(player.x<=(canvas.width/3)+100 && player.y+player.height+player.velocity.y<=canvas.height-500 && player.x+player.width>=(canvas.width/3)-100 && player.y+player.height+player.velocity.y*3>=canvas.height-500){
-        // console.log('condition hit');
-        player.velocity.y=0;
-    }
-    if(player.x+player.width>=(2*canvas.width/3)-100 && player.x<=(2*canvas.width/3)+100 && player.y+player.height<=canvas.height-500 && player.y+player.height+player.velocity.y*3>=canvas.height-500){
-        player.velocity.y=0;
-    }
+    // platforms.forEach(platform => {
+    //     if(player.velocity.x<0){
+    //         // console.log('hit hua bhai');
+    //         if(player.x<=platform.x+platform.width && player.x+player.width>=platform.x && player.y+player.height>=platform.y && player.y<=platform.y-platform.height && player.y+player.height+player.velocity.y*3){
+    //             console.log('hit hua bhai');
+    //             player.velocity.y=0;
+    //         }
+    //     }
+    //     else if (player.velocity.x>0){
+    //         // console.log('hit hua bhai');
+    //         if(player.x<=platform.x+platform.width && player.x+player.width>=platform.x && player.y+player.height>=platform.y && player.y<=platform.y-platform.height && player.y+player.height+player.velocity.y*3){
+    //             console.log('hit hua bhai');
+    //             player.velocity.y=0;
+    //         }
+    //     }
+    // });
+    // if(player.x<=(canvas.width/3)+200 && player.y+player.height+player.velocity.y<=canvas.height-300 && player.x+player.width>=(canvas.width/3)-200 && player.y+player.height+player.velocity.y*3>=canvas.height-300){
+    //     // console.log('condition hit');
+    //     player.velocity.y=0;
+    // }
+    // if(player.x+player.width>=(2*canvas.width/3)-200 && player.x<=(2*canvas.width/3)+200 && player.y+player.height<=canvas.height-300 && player.y+player.height+player.velocity.y*3>=canvas.height-300){
+    //     player.velocity.y=0;
+    // }
+    // if(player.x+player.width>=(2*canvas.width/3)-150 && player.x<=(2*canvas.width/3)+150 && player.y+player.height<=canvas.height-400 && player.y+player.height+player.velocity.y*3>=canvas.height-400){
+    //     player.velocity.y=0;
+    // }
+    // if(player.x<=(canvas.width/3)+150 && player.y+player.height+player.velocity.y<=canvas.height-400 && player.x+player.width>=(canvas.width/3)-150 && player.y+player.height+player.velocity.y*3>=canvas.height-400){
+    //     // console.log('condition hit');
+    //     player.velocity.y=0;
+    // }
+    // if(player.x<=(canvas.width/3)+100 && player.y+player.height+player.velocity.y<=canvas.height-500 && player.x+player.width>=(canvas.width/3)-100 && player.y+player.height+player.velocity.y*3>=canvas.height-500){
+    //     // console.log('condition hit');
+    //     player.velocity.y=0;
+    // }
+    // if(player.x+player.width>=(2*canvas.width/3)-100 && player.x<=(2*canvas.width/3)+100 && player.y+player.height<=canvas.height-500 && player.y+player.height+player.velocity.y*3>=canvas.height-500){
+    //     player.velocity.y=0;
+    // }
     if(player.x+player.width>=(2*canvas.width/3)-50 && player.x<=(2*canvas.width/3)+50 && player.y+player.height<=canvas.height-600 && player.y+player.height+player.velocity.y*3>=canvas.height-600){
         player.velocity.y=0;
     }
@@ -417,7 +463,6 @@ function animate () {
     }
     }
     player.update();
-
     for(let i=0;i<enemy.length;i++){
         enemy[i].update();
     }
@@ -447,18 +492,18 @@ function animate () {
     if(player.y+player.height<=platform3.y && player.y+player.height+player.velocity.y>=platform3.y && player.x+player.width>=platform3.x && player.x<=platform3.x+platform3.width){
         player.velocity.y=0;
     }
-    if(player.x<=platform2.x+platform2.width && player.y+player.height>=platform2.y){
-        player.velocity.x=0;
-        if(keys.right.pressed){
-            player.velocity.x=5;
-        }
-    }
-        if(player.x+player.width>=platform3.x && player.y+player.height>=platform3.y){
-            player.velocity.x=0;
-            if(keys.left.pressed){
-                player.velocity.x=-5;
-            }
-    }
+    // if(player.x<=platform2.x+platform2.width && player.y+player.height>=platform2.y){
+    //     player.velocity.x=0;
+    //     if(keys.right.pressed){
+    //         player.velocity.x=5;
+    //     }
+    // }
+    //     if(player.x+player.width>=platform3.x && player.y+player.height>=platform3.y){
+    //         player.velocity.x=0;
+    //         if(keys.left.pressed){
+    //             player.velocity.x=-5;
+    //         }
+    // }
     bullets.forEach((bull,bullIndex) => {
         if(bull.x>=canvas.width || bull.x<0){
             bullets.splice(bullIndex,1);
@@ -475,5 +520,7 @@ function animate () {
     zombieBulletToObstacle();
 }
 spawnEnemies();
-spawnBullet();
+setTimeout(()=>{
+    spawnBullet();
+},20000);
 animate();

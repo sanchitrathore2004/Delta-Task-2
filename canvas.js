@@ -128,7 +128,7 @@ class Enemy{
     else if (!flag){
         // console.log(reRenderZombie.slice(-1)[0]);
         if(this.x>=reRenderZombie.slice(-1)[0].x && this.velocity.x>0){
-            this.velocity.x=0;
+           this.velocity.x=0;
         }
         if(this.y<=reRenderZombie.slice(-1)[0].y){
             this.velocity.y=0;
@@ -326,7 +326,7 @@ function spawnEnemies () {
 else {
     return;
 }
-    },1000);
+    },5);
 }
 
 function spawnBullet() {
@@ -352,7 +352,7 @@ function spawnBullet() {
               }
         }
         bullets.push(new Bullet(bulletPosition[index].x+bulletPosition[index].width, bulletPosition[index].y+bulletPosition[index].height, 10, 'white',velocity));
-    }, 1000);
+    }, 200);
     }
 
 function zombieBulletToObstacle() {
@@ -439,50 +439,12 @@ function playerBulletToZombie () {
 
 
 function playerBlockCollision () {
-    // platforms.forEach(platform => {
-    //     if(player.velocity.x<0){
-    //         // console.log('hit hua bhai');
-    //         if(player.x<=platform.x+platform.width && player.x+player.width>=platform.x && player.y+player.height>=platform.y && player.y<=platform.y-platform.height && player.y+player.height+player.velocity.y*3){
-    //             console.log('hit hua bhai');
-    //             player.velocity.y=0;
-    //         }
-    //     }
-    //     else if (player.velocity.x>0){
-    //         // console.log('hit hua bhai');
-    //         if(player.x<=platform.x+platform.width && player.x+player.width>=platform.x && player.y+player.height>=platform.y && player.y<=platform.y-platform.height && player.y+player.height+player.velocity.y*3){
-    //             console.log('hit hua bhai');
-    //             player.velocity.y=0;
-    //         }
-    //     }
-    // });
-    // if(player.x<=(canvas.width/3)+200 && player.y+player.height+player.velocity.y<=canvas.height-300 && player.x+player.width>=(canvas.width/3)-200 && player.y+player.height+player.velocity.y*3>=canvas.height-300){
-    //     // console.log('condition hit');
-    //     player.velocity.y=0;
-    // }
-    // if(player.x+player.width>=(2*canvas.width/3)-200 && player.x<=(2*canvas.width/3)+200 && player.y+player.height<=canvas.height-300 && player.y+player.height+player.velocity.y*3>=canvas.height-300){
-    //     player.velocity.y=0;
-    // }
-    // if(player.x+player.width>=(2*canvas.width/3)-150 && player.x<=(2*canvas.width/3)+150 && player.y+player.height<=canvas.height-400 && player.y+player.height+player.velocity.y*3>=canvas.height-400){
-    //     player.velocity.y=0;
-    // }
-    // if(player.x<=(canvas.width/3)+150 && player.y+player.height+player.velocity.y<=canvas.height-400 && player.x+player.width>=(canvas.width/3)-150 && player.y+player.height+player.velocity.y*3>=canvas.height-400){
-    //     // console.log('condition hit');
-    //     player.velocity.y=0;
-    // }
-    // if(player.x<=(canvas.width/3)+100 && player.y+player.height+player.velocity.y<=canvas.height-500 && player.x+player.width>=(canvas.width/3)-100 && player.y+player.height+player.velocity.y*3>=canvas.height-500){
-    //     // console.log('condition hit');
-    //     player.velocity.y=0;
-    // }
-    // if(player.x+player.width>=(2*canvas.width/3)-100 && player.x<=(2*canvas.width/3)+100 && player.y+player.height<=canvas.height-500 && player.y+player.height+player.velocity.y*3>=canvas.height-500){
-    //     player.velocity.y=0;
-    // }
-    if(player.x+player.width>=(2*canvas.width/3)-50 && player.x<=(2*canvas.width/3)+50 && player.y+player.height<=canvas.height-600 && player.y+player.height+player.velocity.y*3>=canvas.height-600){
-        player.velocity.y=0;
-    }
-    if(player.x<=(canvas.width/3)+50 && player.y+player.height+player.velocity.y<=canvas.height-600 && player.x+player.width>=(canvas.width/3)-50 && player.y+player.height+player.velocity.y*3>=canvas.height-600){
-        // console.log('condition hit');
-        player.velocity.y=0;
-    }
+    platforms.forEach(platform => {
+            if(player.x<=platform.x+platform.width && player.x+player.width>=platform.x && player.y+player.height<=platform.y && player.y+player.height+player.velocity.y>=platform.y){
+                console.log('hit hua bhai');
+                player.velocity.y=0;
+            }
+    });
 }
 
 function movingZombies () {
@@ -583,18 +545,6 @@ function animate () {
     if(player.y+player.height<=platform3.y && player.y+player.height+player.velocity.y>=platform3.y && player.x+player.width>=platform3.x && player.x<=platform3.x+platform3.width){
         player.velocity.y=0;
     }
-    // if(player.x<=platform2.x+platform2.width && player.y+player.height>=platform2.y){
-    //     player.velocity.x=0;
-    //     if(keys.right.pressed){
-    //         player.velocity.x=5;
-    //     }
-    // }
-    //     if(player.x+player.width>=platform3.x && player.y+player.height>=platform3.y){
-    //         player.velocity.x=0;
-    //         if(keys.left.pressed){
-    //             player.velocity.x=-5;
-    //         }
-    // }
     bullets.forEach((bull,bullIndex) => {
         if(bull.x>=canvas.width || bull.x<0){
             bullets.splice(bullIndex,1);
@@ -613,6 +563,6 @@ function animate () {
 spawnEnemies();
 setTimeout(()=>{
     spawnBullet();
-},20000);
+},7);
 timerFunction();
 animate();

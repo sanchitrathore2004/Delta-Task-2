@@ -15,6 +15,9 @@ let setScore=0;
 let healthStatus=document.querySelector("#health-status");
 let healthScore=100;
 let reRenderZombie=[];
+let timer=document.querySelector("#time-left");
+let timeText=document.querySelector(".timer");
+let timeLeft=120;
 
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight-50;
@@ -189,6 +192,7 @@ let bullets=[];
 let enemy=[];
 let enemyRight=[];
 let playerShoot=[];
+let arrivingZombies=[];
 
 let player=new Player(canvas.width/2,canvas.height/2,50,50,'red',image);
 let platform1=new Platform(canvas.width/2,4*canvas.height/5,20,200,'blue');
@@ -278,6 +282,7 @@ let bulletPosition=[];
 
 function spawnEnemies () {
     setInterval(()=>{
+        if(timeLeft>0){
     if(enemy.length<=8)
         {
             enemy.push(new Enemy(0-50,canvas.height-50,50,50,{x:3,y:-3},'yellow'));
@@ -290,10 +295,12 @@ function spawnEnemies () {
     else{
         return;
     } 
+}
+else {
+    return;
+}
     },1000);
 }
-
-// let bulletPosition=[0,(5*canvas.height/6)-25,(5*canvas.height/6)-85,(5*canvas.height/6)-145,(5*canvas.height/6)-195,(5*canvas.height/6)-255,(5*canvas.height/6)-315];
 
 function spawnBullet() {
     setInterval(() => {
@@ -451,6 +458,23 @@ function playerBlockCollision () {
     }
 }
 
+function movingZombies () {
+    
+}
+
+function timerFunction () {
+    setInterval(() => {
+        timeLeft-=1;
+        timer.innerHTML=`${timeLeft} SECONDS`;
+        if(timeLeft==0){
+            timeText.innerHTML="ZOMBIES ARE ARRIVING";
+            enemy=[];
+            enemyRight=[];
+            return;
+        }
+    }, 1000);
+}
+
 function animate () {
     requestAnimationFrame(animate);
     c.clearRect(0,0,canvas.width,canvas.height);
@@ -521,6 +545,7 @@ function animate () {
 }
 spawnEnemies();
 setTimeout(()=>{
-    spawnBullet();
+    // spawnBullet();
 },20000);
+timerFunction();
 animate();

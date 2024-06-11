@@ -17,7 +17,7 @@ let healthScore=100;
 let reRenderZombie=[];
 let timer=document.querySelector("#time-left");
 let timeText=document.querySelector(".timer");
-let timeLeft=12;
+let timeLeft=120;
 
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight-50;
@@ -612,7 +612,7 @@ function animate () {
 }
 spawnEnemies();
 setTimeout(()=>{
-    // spawnBullet();
+    spawnBullet();
 },20000);
 timerFunction();
 animate();

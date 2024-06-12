@@ -17,7 +17,8 @@ let healthScore=100;
 let reRenderZombie=[];
 let timer=document.querySelector("#time-left");
 let timeText=document.querySelector(".timer");
-let timeLeft=120;
+let timeLeft=12;
+let status='not done';
 
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight-50;
@@ -189,13 +190,14 @@ class PlayerBullet {
 }
 
 class Zombies {
-    constructor (x,y,width,height,velocity,color) {
+    constructor (x,y,width,height,velocity,color,hasCollided) {
         this.x=x;
         this.y=y;
         this.width=width;
         this.height=height;
         this.velocity=velocity;
         this.color=color;
+        this.hasCollided=hasCollided;
     }
     draw () {
         c.beginPath();
@@ -329,32 +331,6 @@ else {
     },5);
 }
 
-function spawnBullet() {
-    setInterval(() => {
-        let speed=5;
-        let velocity={
-            x:null,
-            y:null
-        }
-        let xPoint;
-        let index=Math.floor(((Math.random()*18)));
-        console.log(index);
-        if(bulletPosition[index].x>canvas.width/2){
-              velocity={
-                x:-1*speed,
-                y:null
-              } 
-        }
-        else{
-              velocity={
-                x:1*speed,
-                y:null
-              }
-        }
-        bullets.push(new Bullet(bulletPosition[index].x+bulletPosition[index].width, bulletPosition[index].y+bulletPosition[index].height, 10, 'white',velocity));
-    }, 200);
-    }
-
 function zombieBulletToObstacle() {
     bullets.forEach((bullet,bullIndex) => {
         platforms.forEach((plat,platIndex) => {
@@ -469,9 +445,55 @@ function movingZombies () {
                 y:Math.random()*speed
             }
         }
-        arrivingZombies.push(new Zombies(xPoint[xCheck],yPoint,50,50,velocity,'orange'));
-    },1000);
+        arrivingZombies.push(new Zombies(xPoint[xCheck],yPoint,50,50,velocity,'orange','not collided'));
+    },4000);
 }
+
+function spawnBullet() {
+    setInterval(() => {
+        let speed=5;
+        let velocity={
+            x:null,
+            y:null
+        }
+        let xPoint;
+        let index=Math.floor(((Math.random()*18)));
+        console.log(index);
+        if(bulletPosition[index].x>canvas.width/2){
+              velocity={
+                x:-1*speed,
+                y:null
+              } 
+        }
+        else{
+              velocity={
+                x:1*speed,
+                y:null
+              }
+        }
+        if(arrivingZombies.length>0){
+            let aIndex=Math.floor(Math.random()*arrivingZombies.length);
+            if(arrivingZombies[aIndex].x<=canvas.width){
+                velocity={
+                    x:1*speed,
+                    y:null
+                }
+            }
+            else if(arrivingZombies[aIndex].x>=canvas.width){
+                velocity={
+                    x:-1*speed,
+                    y:null
+                }
+            }
+            bullets.push(new Bullet(arrivingZombies[aIndex].x+arrivingZombies[aIndex].width,arrivingZombies[aIndex].y+arrivingZombies[aIndex].height,10,'wheat',velocity));
+            
+            return;
+        }
+        else{
+        bullets.push(new Bullet(bulletPosition[index].x+bulletPosition[index].width, bulletPosition[index].y+bulletPosition[index].height, 10, 'white',velocity));
+    }
+    }, 200);
+    }
 
 function timerFunction () {
     setInterval(() => {
@@ -496,6 +518,18 @@ function playerBulletToMovingZombie () {
             }
         });
     });
+}
+
+function zombiePlayerTouch () {
+    arrivingZombies.forEach((zombie) => {
+        if(zombie.x+zombie.width>=player.x && zombie.x<=player.x+player.width && zombie.y+zombie.height>=player.y && zombie.y<=player.y+player.height){
+            if(zombie.hasCollided==='not collided'){
+            healthScore-=25;
+            healthStatus.innerHTML=`${healthScore}%`;
+            zombie.hasCollided='collided';
+        }
+        }
+    })
 }
 
 function animate () {
@@ -526,6 +560,7 @@ function animate () {
         if(arrivingZombies[i]){
             arrivingZombies[i].update();
             playerBulletToMovingZombie();
+            zombiePlayerTouch();
         }
     }
     if(keys.left.pressed){

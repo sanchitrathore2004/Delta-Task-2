@@ -17,7 +17,7 @@ let healthScore=100;
 let reRenderZombie=[];
 let timer=document.querySelector("#time-left");
 let timeText=document.querySelector(".timer");
-let timeLeft=12;
+let timeLeft=120;
 let status='not done';
 
 canvas.width=window.innerWidth;

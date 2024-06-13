@@ -17,18 +17,28 @@
         }
         .score,
         .health,
-        .timer{
+        .timer,
+        .pause,
+        .play{
+            padding: 3px;
             color: white;
             /* position: absolute; */
             font-size: x-large;
             font-weight: bold;
             font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
             user-select: none;
+            transition: background-color 0.5s, color 0.5s ease;
+        }
+        .pause:hover,
+        .play:hover{
+            cursor: pointer;
+            background-color: bisque;
+            color: black;
         }
     </style>
 </head>
 <body><div class="all">
-    <div class="score">SCORE : <span id="point">0</span></div> <div class="timer">ZOMBIES WILL MOVE IN : <span id="time-left">120 SECONDS</span></div> <div class="health">HEALTH : <span id="health-status">100%</span></div>
+    <div class="score">SCORE : <span id="point">0</span></div><div class="pause">PAUSE</div> <div class="play">PLAY</div><div class="health">HEALTH : <span id="health-status">100%</span></div>
 </div>
     <canvas></canvas>
     <script type="module" src="canvas.js"></script>

@@ -9,21 +9,12 @@ projectile making
 colouring of the game
 game ui
 
+abhi ke liye kya krna h
 
-player ki bullet se zombie maaro ---- doneeee
-zombie re render krao ---- doneee
-zombie ki bullet se obstacle htao ------ doneeee
-player health bnao ---- doneeeee
-zombie ki bullet se player health kam kro----doneeee
-zombie aage move honge aur player health kam krenge usko touch krke
-scoring system bnao ---- doneeee
-agr obstacles hat gae to phir player uspe nahi chad skta --- platforms array ka use kro collision detect krne ke liye ----- doneee
+1. zombie dur dur aane chahiye ---- ye bhi ho gya
+2. zombie goli thoda ruk ke chalaye --- krdia
+3. obstacle detect krke ruke aur footne pe aage badhe --- ye to ho gya
+4. zombie touch se health kam krao ----- vahi continous vala problem aa rha h
+5. ek zombie maarne pe do mar ja rhe ------ doneeee 
 
-
-
-player ki bullet se moving zombie theek se nahi mar rhe condition check kro 
-moving zombie player touch pe health kam kro 1 ---- doneee
-static zombie re render nahi ho rhe agr ek sath 2 maar do to
-jump theek kro 2 
-platforms lgao 3 
-moving zombie bhi bullet chalaenge 4 ----- doneee
+6. obstacles pr gravity theek se nahi lg thi h abhi jo upar h unpe

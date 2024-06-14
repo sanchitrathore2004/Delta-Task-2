@@ -325,14 +325,14 @@ let platform1=new Plank(canvas.width/2,4*canvas.height/5,20,200,'blue');
 let platform2=new Pillar(canvas.width/3,canvas.height-200,200,40,'blue');
 let platform3=new Pillar(2*canvas.width/3,canvas.height-200,200,40,'blue');
 let platform3a=new Plank(canvas.width/3+2*player.width,8*canvas.height/9,20,200,'blue');
-let platform3b=new Plank(canvas.width/3+3*player.width,canvas.height/3,20,200,'pink');
+// let platform3b=new Plank(canvas.width/3+3*player.width,canvas.height/3,20,200,'pink');
 let platform3c=new Plank(canvas.width/8,3*canvas.height/4,20,200,'blue');
 let platform3d=new Plank(3*canvas.width/4,5*canvas.height/6-50,20,200,'blue');
-let platform3e=new Plank(canvas.width/3+3*player.width,canvas.height/4,20,100,'blue');
-let platform3f=new Plank(canvas.width/3+3*player.width,canvas.height/6,20,50,'blue');
-let platform3g=new Plank(canvas.width/3+3*player.width,canvas.height/10,20,25,'blue');
+// let platform3e=new Plank(canvas.width/3+3*player.width,canvas.height/4,20,100,'blue');
+// let platform3f=new Plank(canvas.width/3+3*player.width,canvas.height/6,20,50,'blue');
+// let platform3g=new Plank(canvas.width/3+3*player.width,canvas.height/10,20,25,'blue');
 
-standOn=[platform1,platform2,platform3,platform3a,platform3b,platform3c,platform3d,platform3e,platform3f,platform3g];
+standOn=[platform1,platform2,platform3,platform3a,platform3c,platform3d];
 
 let platform20=new Platform(3*canvas.width/4,3*canvas.height/5+10,100,100,'silver',{x:0,y:1});
 let platform21=new Platform(canvas.width/8,3*canvas.height/4-100,100,100,'green',{x:0,y:1});

@@ -23,6 +23,9 @@ pillar.src='./pillarnobg.png';
 const plank=new Image();
 plank.src='./plank.png';
 
+const gunZombie=new Image();
+gunZombie.src='./machine gun zombie 2.png';
+
 function drawBackground() {
     c.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 }
@@ -214,12 +217,40 @@ class Enemy{
 
     update() {
         this.draw();
+        if(this.y+this.height<=canvas.height){
+            this.velocity.y+=gravity;
+        }
+        if(this.y+this.height+50>=canvas.height){
+            this.velocity.y=0;
+        }
         if(this.x<canvas.width/2){
         this.velocity.x=1;
     }
     else if(this.x>canvas.width/2){
         this.velocity.x=-1;
     }
+    if(this.x+this.width>=canvas.width/3+100 && this.velocity.x>0){
+        this.velocity.x=0;
+    }
+    
+    if(this.x+this.width<=2*canvas.width/3+50 && this.velocity.x<0){
+        this.velocity.x=0;
+    }
+    platforms.forEach((platform)=>{
+                if(this.x+this.width>=platform.x && this.x<=platform.x+platform.width && this.y+this.height>=platform.y && this.y<=platform.y+platform.height){
+                    console.log('jump kro');
+                    this.velocity.y-=1;
+                    if(this.y+this.height<canvas.height){
+                        if(this.x+this.width>=platform.x+platform.width){
+                            // console.log('ruko');
+                            this.velocity.x=0;
+                        }
+                    }
+                }
+                if(this.y+this.height+25<=platform.y){
+                    this.velocity.y=0;
+                }
+            });
         platforms.forEach((platform)=>{
             if(this.x+this.width>=platform.x &&  this.velocity.x>0 && this.y+this.height>=platform.y && this.y<=platform.y+platform.height){
                 this.velocity.x=0;
@@ -239,6 +270,7 @@ class Enemy{
             }
         }
         this.x+=this.velocity.x;
+        this.y+=this.velocity.y;
     }
 }
 
@@ -299,53 +331,57 @@ class Zombies {
         this.hasCollided=hasCollided;
     }
     draw () {
-        c.beginPath();
-        c.fillStyle=this.color;
-        c.fillRect(this.x,this.y,this.width,this.height);
+        // c.beginPath();
+        // c.fillStyle=this.color;
+        // c.fillRect(this.x,this.y,this.width,this.height);
+        c.drawImage(gunZombie,this.x,this.y,this.width,this.height);
     }
     update () {
         this.draw();
-        if(this.y<=0 || this.y+this.height>=canvas.height){
-            this.velocity.y=-this.velocity.y;
+        if(this.x+this.width>=canvas.width/3+200 && this.velocity.x>0){
+            this.velocity.x=0;
         }
-        if(this.x<=0 || this.x+this.width>=canvas.width){
-            this.velocity.x=-this.velocity.x;
+        if(this.x<=2*canvas.width/3-150 && this.velocity.x<0){
+            this.velocity.x=0;
         }
         this.x+=this.velocity.x;
-        this.y+=this.velocity.y;
     }
 }
 
 let bullets=[];
 let playerShoot=[];
-let arrivingZombies=[];
+let machineGunZombies=[];
+for(let i=0;i<2;i++){
+    if(i==0){
+        machineGunZombies.push(new Zombies(0,canvas.height-100,100,100,{x:1,y:null},'pink'));
+    }
+    else{
+        machineGunZombies.push(new Zombies(canvas.width,canvas.height-100,100,100,{x:-1,y:null},'pink'));
+    }
+}
     
 let player=new Player(canvas.width/2,canvas.height/2,100,100,'red');
 let platform1=new Plank(canvas.width/2,4*canvas.height/5,20,200,'blue');
 let platform2=new Pillar(canvas.width/3,canvas.height-200,200,40,'blue');
 let platform3=new Pillar(2*canvas.width/3,canvas.height-200,200,40,'blue');
 let platform3a=new Plank(canvas.width/3+2*player.width,8*canvas.height/9,20,200,'blue');
-// let platform3b=new Plank(canvas.width/3+3*player.width,canvas.height/3,20,200,'pink');
-let platform3c=new Plank(canvas.width/8,3*canvas.height/4,20,200,'blue');
-let platform3d=new Plank(3*canvas.width/4,5*canvas.height/6-50,20,200,'blue');
-// let platform3e=new Plank(canvas.width/3+3*player.width,canvas.height/4,20,100,'blue');
-// let platform3f=new Plank(canvas.width/3+3*player.width,canvas.height/6,20,50,'blue');
-// let platform3g=new Plank(canvas.width/3+3*player.width,canvas.height/10,20,25,'blue');
+let platform3c=new Plank(canvas.width/8,2*canvas.height/3,20,200,'blue');
+let platform3d=new Plank(3*canvas.width/4,2*canvas.height/3-50,20,200,'blue');
 
 standOn=[platform1,platform2,platform3,platform3a,platform3c,platform3d];
 
-let platform20=new Platform(3*canvas.width/4,3*canvas.height/5+10,100,100,'silver',{x:0,y:1});
-let platform21=new Platform(canvas.width/8,3*canvas.height/4-100,100,100,'green',{x:0,y:1});
-let platform22=new Platform(canvas.width/2-147,canvas.height-178,100,100,'violet',{x:0,y:1});
-let platform23=new Platform(2*canvas.width/3-150,canvas.height-240,100,100,'orange',{x:0,y:1});
-let platform24=new Platform(canvas.width/3,canvas.height-100,100,100,'orange',{x:0,y:1});
-let platform25=new Platform(canvas.width/4,canvas.height-100,100,100,'orange',{x:0,y:1});
-let platform26=new Platform(canvas.width/6,canvas.height-100,100,100,'orange',{x:0,y:1});
-let platform27=new Platform(2*canvas.width/3+70,canvas.height-100,100,100,'orange',{x:0,y:1});
-let platform28=new Platform(2*canvas.width/3-60,canvas.height-100,100,100,'orange',{x:0,y:1});
-let platform29=new Platform(4*canvas.width/5,canvas.height-100,100,100,'orange',{x:0,y:1});
+let platform4=new Platform(3*canvas.width/4,3*canvas.height/5-115,100,100,'silver',{x:0,y:1});
+let platform5=new Platform(canvas.width/8,3*canvas.height/4-158,100,100,'green',{x:0,y:1});
+let platform6=new Platform(canvas.width/2-147,canvas.height-178,100,100,'violet',{x:0,y:1});
+let platform7=new Platform(2*canvas.width/3-150,canvas.height-240,100,100,'orange',{x:0,y:1});
+let platform8=new Platform(canvas.width/3,canvas.height-100,100,100,'orange',{x:0,y:1});
+let platform9=new Platform(canvas.width/4,canvas.height-100,100,100,'orange',{x:0,y:1});
+let platform10=new Platform(canvas.width/6,canvas.height-100,100,100,'orange',{x:0,y:1});
+let platform11=new Platform(2*canvas.width/3+70,canvas.height-100,100,100,'orange',{x:0,y:1});
+let platform12=new Platform(2*canvas.width/3-60,canvas.height-100,100,100,'orange',{x:0,y:1});
+let platform13=new Platform(4*canvas.width/5,canvas.height-100,100,100,'orange',{x:0,y:1});
 
-for(let i=20;i<=29;i++){
+for(let i=4;i<=13;i++){
     platforms[i-4]=eval(`platform${i}`);
 }
 console.log(platforms);
@@ -430,21 +466,21 @@ function zombieBulletToObstacle() {
             if(bullet.velocity.x>0){
                 if(bullet.x+bullet.radius>=plat.x && bullet.x-bullet.radius<=plat.x+plat.width && bullet.y+bullet.radius>=plat.y && bullet.y-bullet.radius<=plat.y+plat.height){
                     bullets.splice(bullIndex,1);
-                    plat.width-=33.33;
-                    plat.height-=33.33;
-                    if(plat.height<=1){
+                    // plat.width-=33.33;
+                    // plat.height-=33.33;
+                    // if(plat.height<=1){
                     platforms.splice(platIndex,1);
-                }
+                
                 }
             }
             else if(bullet.velocity.x<0){
                 if(bullet.x-bullet.radius<=plat.x+plat.width && bullet.x+bullet.radius>=plat.x && bullet.y+bullet.radius>=plat.y && bullet.y-bullet.radius<=plat.y+plat.height){
                     bullets.splice(bullIndex,1)
-                    plat.width-=33.33;
-                    plat.height-=33.33;
-                    if(plat.height<=1){
+                    // plat.width-=33.33;
+                    // plat.height-=33.33;
+                    // if(plat.height<=1){
                     platforms.splice(platIndex,1);
-                }
+                
                 }
             }
         });
@@ -550,12 +586,16 @@ function spawnBullet() {
                     y:null
                 }
             }
+            if(bulletPosition[aIndex].y+bulletPosition[aIndex].height+50<canvas.height){
             bullets.push(new Bullet(arrivingZombies[aIndex].x+arrivingZombies[aIndex].width,arrivingZombies[aIndex].y+arrivingZombies[aIndex].height*Math.random(),10,'black',velocity));
+        }
             
             return;
         }
         else{
+            if(bulletPosition[index].y+bulletPosition[index].height+50<canvas.height){
         bullets.push(new Bullet(bulletPosition[index].x+bulletPosition[index].width, bulletPosition[index].y+bulletPosition[index].height*Math.random(), 10, 'black',velocity));
+    }
     }
     }, 2000);
     }
@@ -614,6 +654,9 @@ function animate () {
     }
     for(let i=0;i<enemyRight.length;i++){
         enemyRight[i].update();
+    }
+    for(let i=0;i<machineGunZombies.length;i++){
+        machineGunZombies[i].update();
     }
     player.update();
     standOn.forEach((stand)=>{

@@ -47,9 +47,26 @@ let platforms=[];
 let enemy=[];
 let enemyRight=[];
 let animationFrameID;
+let resetBtn=document.querySelector(".reset");
+let scoreArray=[];
+let closeLeaderboard=document.querySelector(".close");
+let leader=document.querySelector("#leader");
+let lBtn=document.querySelector(".leaderboard");
 
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight-50;
+
+closeLeaderboard.addEventListener("click", function () {
+    leader.style.visibility='hidden';
+});
+
+lBtn.addEventListener("click", function () {
+    leader.style.visibility='visible';
+});
+
+resetBtn.addEventListener('click', function (){
+    location.reload();
+});
 
 window.addEventListener('resize', () => {
     canvas.width=innerWidth;

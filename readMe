@@ -14,7 +14,19 @@ abhi ke liye kya krna h
 1. zombie dur dur aane chahiye ---- ye bhi ho gya
 2. zombie goli thoda ruk ke chalaye --- krdia
 3. obstacle detect krke ruke aur footne pe aage badhe --- ye to ho gya
-4. zombie touch se health kam krao ----- vahi continous vala problem aa rha h
 5. ek zombie maarne pe do mar ja rhe ------ doneeee 
 
-6. obstacles pr gravity theek se nahi lg thi h abhi jo upar h unpe
+
+previous jo reh gya
+1. obstacles pr gravity theek se nahi lg thi h abhi jo upar h unpe
+2. zombie touch se health kam krao ----- vahi continous vala problem aa rha h
+3. leaderboard ka doubt solve kro
+
+types of zombies
+1. all zombies will climb 
+2. one will fire bullet in projectiles && have a sheild goli sirf per pr lgni chahiye
+3. jumping zombie and bullet firing 
+
+healing
+1. bandages to increase health by 10%
+

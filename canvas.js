@@ -55,6 +55,7 @@ let scoreArray=[];
 let closeLeaderboard=document.querySelector(".close");
 let leader=document.querySelector("#leader");
 let lBtn=document.querySelector(".leaderboard");
+let maxHealth=100;
 
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight-50;
@@ -297,12 +298,13 @@ class Bullet {
 }
 
 class PlayerBullet {
-    constructor(x,y,radius,color,velocity) {
+    constructor(x,y,radius,color,velocity,hasCollided) {
         this.x=x;
         this.y=y;
         this.radius=radius;
         this.color=color;
         this.velocity=velocity;
+        this.hasCollided=hasCollided;
     }
 
     draw() {
@@ -321,7 +323,7 @@ class PlayerBullet {
 }
 
 class Zombies {
-    constructor (x,y,width,height,velocity,color,direction) {
+    constructor (x,y,width,height,velocity,color,direction,collisionStatus) {
         this.x=x;
         this.y=y;
         this.width=width;
@@ -329,6 +331,7 @@ class Zombies {
         this.velocity=velocity;
         this.color=color;
         this.direction=direction;
+        this.collisionStatus=collisionStatus;
     }
     draw () {
         // c.beginPath();
@@ -355,22 +358,32 @@ class Zombies {
 }
 
 class HealthBar {
-    constructor (x,y,width,height,velocity,color){
+    constructor (x,y,width,height,velocity,color,maxwidth,maxHealth){
         this.x=x;
         this.y=y;
         this.width=width;
         this.height=height;
         this.velocity=velocity;
         this.color=color;
+        this.maxwidth=maxwidth
+        this.maxHealth=maxHealth;
     }
     draw(){
         c.beginPath();
+        c.lineWidth=5;
+        c.strokeStyle='black';
         c.fillStyle=this.color;
+        c.strokeRect(this.x,this.y,this.maxwidth,this.height);
         c.fillRect(this.x,this.y,this.width,this.height);
     }
     update(){
         this.draw();
         this.x+=this.velocity.x;
+    }
+    updateHealth(val){
+        this.health=val;
+        this.width=(this.health/this.maxHealth)*this.maxwidth;
+        this.draw();
     }
 }
 
@@ -379,18 +392,26 @@ let playerShoot=[];
 let machineGunZombies=[];
 let arrivingZombies=[];
 let healthBar=[];
-for(let i=0;i<2;i++){
-    if(i==0){
-        machineGunZombies.push(new Zombies(0,canvas.height-100,100,100,{x:1,y:null},'pink','left'));
+machineGunZombies.push(new Zombies(canvas.width,canvas.height-100,100,100,{x:-1,y:null},'pink','right'));
+machineGunZombies.push(new Zombies(0,canvas.height-100,100,100,{x:1,y:null},'pink','left'));
+function reSpawnGunZombies () {
+    setInterval(()=>{
+        if(machineGunZombies.length<2){
+            console.log(machineGunZombies);
+            if(machineGunZombies[0].direction=='left'){
+                machineGunZombies.push(new Zombies(canvas.width,canvas.height-100,100,100,{x:-1,y:null},'pink','right','not collided'));
+            }
+            else{
+        machineGunZombies.push(new Zombies(0,canvas.height-100,100,100,{x:1,y:null},'pink','left','not collided'));
     }
-    else{
-        machineGunZombies.push(new Zombies(canvas.width,canvas.height-100,100,100,{x:-1,y:null},'pink','right'));
     }
-}
-
+},1);
+}   
+let width=100;
+let maxwidth=100;
 function healthOfMachineZombies() {
-    healthBar.push(new HealthBar(machineGunZombies[0].x,machineGunZombies[0].y-25,100,20,machineGunZombies[0].velocity,'red'));
-    healthBar.push(new HealthBar(machineGunZombies[1].x,machineGunZombies[1].y-25,100,20,machineGunZombies[1].velocity,'red'));
+    healthBar.push(new HealthBar(machineGunZombies[0].x,machineGunZombies[0].y-25,width,20,machineGunZombies[0].velocity,'red',maxwidth,100));
+    healthBar.push(new HealthBar(machineGunZombies[1].x,machineGunZombies[1].y-25,width,20,machineGunZombies[1].velocity,'red',maxwidth,100));
 }
     
 let player=new Player(canvas.width/2,canvas.height/2,100,100,'red');
@@ -427,7 +448,7 @@ addEventListener('click', (event) => {
         x:Math.cos(angle)*speed,
         y:Math.sin(angle)*speed
     }
-    playerShoot.push(new PlayerBullet(player.x+100,player.y+50,10,'pink',velocity));
+    playerShoot.push(new PlayerBullet(player.x+100,player.y+50,10,'pink',velocity,false));
 })
 addEventListener('keydown', (event) => {
     let keyCode=event.keyCode;
@@ -597,7 +618,13 @@ function playerBulletToZombie () {
         });
         machineGunZombies.forEach((zom,zIndex)=>{
             if(shoot.x+shoot.radius>=zom.x && shoot.x-shoot.radius<=zom.x+zom.width &&(shoot.y+shoot.radius>=zom.y || shoot.y-shoot.radius>=zom.y+zom.height) && (shoot.y+shoot.radius<=zom.y+100 || shoot.y-shoot.radius<=zom.y+zom.height-100)){
-                healthBar[zIndex].x-=10;
+                console.log(healthBar[zIndex].width);
+                if(!shoot.hasCollided){
+                    maxHealth-=10;
+                healthBar[zIndex].updateHealth(maxHealth);
+                shoot.hasCollided=true;
+            }
+                // machineGunZombies.splice(zIndex,1);
             }
         });
     });
@@ -714,6 +741,18 @@ function spawnBullet() {
                 er.collisionStatus='collided';
             }
         });
+        machineGunZombies.forEach((zom)=>{
+            if(zom.x<=player.x+player.width && zom.x+zom.width>=player.x && zom.y+zom.height>=player.y && zom.y<=player.y+player.height && zom.collisionStatus=='not collided'){
+                healthScore-=25;
+                healthStatus.innerHTML=`${healthScore}%`;
+                if(healthScore==0){
+                    alert('game over');
+                    cancelAnimationFrame(animationFrameID);
+
+                }
+                zom.collisionStatus='collided';
+            }
+        });
     }
 
 pauseBtn.addEventListener('click', ()=>{
@@ -724,6 +763,7 @@ playBtn.addEventListener('click', ()=>{
     console.log('hua');
     animate();
 });
+reSpawnGunZombies();
 
 function animate () {
     animationFrameID=requestAnimationFrame(animate);

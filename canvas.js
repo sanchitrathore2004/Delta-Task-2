@@ -238,7 +238,7 @@ class Enemy{
     }
     platforms.forEach((platform)=>{
                 if(this.x+this.width>=platform.x && this.x<=platform.x+platform.width && this.y+this.height>=platform.y && this.y<=platform.y+platform.height){
-                    console.log('jump kro');
+                    // console.log('jump kro');
                     this.velocity.y-=1;
                     if(this.y+this.height<canvas.height){
                         if(this.x+this.width>=platform.x+platform.width){
@@ -321,14 +321,14 @@ class PlayerBullet {
 }
 
 class Zombies {
-    constructor (x,y,width,height,velocity,color,hasCollided) {
+    constructor (x,y,width,height,velocity,color,direction) {
         this.x=x;
         this.y=y;
         this.width=width;
         this.height=height;
         this.velocity=velocity;
         this.color=color;
-        this.hasCollided=hasCollided;
+        this.direction=direction;
     }
     draw () {
         // c.beginPath();
@@ -338,12 +338,38 @@ class Zombies {
     }
     update () {
         this.draw();
-        if(this.x+this.width>=canvas.width/3+200 && this.velocity.x>0){
-            this.velocity.x=0;
+        if(this.x+this.width>=canvas.width/2 && this.direction=='left'){
+            this.velocity.x=-this.velocity.x;
         }
-        if(this.x<=2*canvas.width/3-150 && this.velocity.x<0){
-            this.velocity.x=0;
+        else if(this.x<=canvas.width/3 && this.direction=='left' && this.velocity.x<0){
+            this.velocity.x=-this.velocity.x;
         }
+        if(this.x<=canvas.width/2 && this.direction=='right'){
+            this.velocity.x=-this.velocity.x;
+        }
+        else if(this.x>=2*canvas.width/3 && this.direction=='right' && this.velocity.x>0){
+            this.velocity.x=-this.velocity.x;
+        }
+        this.x+=this.velocity.x;
+    }
+}
+
+class HealthBar {
+    constructor (x,y,width,height,velocity,color){
+        this.x=x;
+        this.y=y;
+        this.width=width;
+        this.height=height;
+        this.velocity=velocity;
+        this.color=color;
+    }
+    draw(){
+        c.beginPath();
+        c.fillStyle=this.color;
+        c.fillRect(this.x,this.y,this.width,this.height);
+    }
+    update(){
+        this.draw();
         this.x+=this.velocity.x;
     }
 }
@@ -351,13 +377,20 @@ class Zombies {
 let bullets=[];
 let playerShoot=[];
 let machineGunZombies=[];
+let arrivingZombies=[];
+let healthBar=[];
 for(let i=0;i<2;i++){
     if(i==0){
-        machineGunZombies.push(new Zombies(0,canvas.height-100,100,100,{x:1,y:null},'pink'));
+        machineGunZombies.push(new Zombies(0,canvas.height-100,100,100,{x:1,y:null},'pink','left'));
     }
     else{
-        machineGunZombies.push(new Zombies(canvas.width,canvas.height-100,100,100,{x:-1,y:null},'pink'));
+        machineGunZombies.push(new Zombies(canvas.width,canvas.height-100,100,100,{x:-1,y:null},'pink','right'));
     }
+}
+
+function healthOfMachineZombies() {
+    healthBar.push(new HealthBar(machineGunZombies[0].x,machineGunZombies[0].y-25,100,20,machineGunZombies[0].velocity,'red'));
+    healthBar.push(new HealthBar(machineGunZombies[1].x,machineGunZombies[1].y-25,100,20,machineGunZombies[1].velocity,'red'));
 }
     
 let player=new Player(canvas.width/2,canvas.height/2,100,100,'red');
@@ -502,7 +535,7 @@ function zombieBulletToPlayer () {
         }
     }
     else{
-        if(b.x-b.radius<=player.x+player.width && b.x+b.radius>=player.x-player.width && b.y+b.radius>=player.y && b.y-b.radius<=player.y+player.height){
+        if(b.x-b.radius<=player.x+player.width && b.x+b.radius>=player.x && b.y+b.radius>=player.y && b.y-b.radius<=player.y+player.height){
             bullets.splice(index,1);
             healthScore-=25;
             healthStatus.innerHTML=`${healthScore}%`;
@@ -511,6 +544,30 @@ function zombieBulletToPlayer () {
             cancelAnimationFrame(animationFrameID);
 
         }
+        }
+    }
+    });
+    machinGun.forEach((gun,gIndex)=>{
+        if(gun.velocity.x>0){
+            if(gun.x+gun.radius>=player.x && gun.x-gun.radius<=player.x+player.width && gun.y+gun.radius>=player.y && gun.y-gun.radius<=player.y+player.height){
+                machinGun.splice(gIndex,1);
+                healthScore-=25;
+                healthStatus.innerHTML=`${healthScore}%`;
+            if(healthScore==0){
+            alert('Game over');
+            cancelAnimationFrame(animationFrameID);
+            }
+        }
+    }
+    else if (gun.velocity.x<0){
+        if(gun.x-gun.radius<=player.x+player.width && gun.x+gun.radius>=player.x && gun.y+gun.radius>=player.y && gun.y-gun.radius<=player.y+player.height){
+            machinGun.splice(gIndex,1);
+            healthScore-=25;
+                healthStatus.innerHTML=`${healthScore}%`;
+            if(healthScore==0){
+            alert('Game over');
+            cancelAnimationFrame(animationFrameID);
+            }
         }
     }
     });
@@ -538,6 +595,11 @@ function playerBulletToZombie () {
                 flag=false;
             }
         });
+        machineGunZombies.forEach((zom,zIndex)=>{
+            if(shoot.x+shoot.radius>=zom.x && shoot.x-shoot.radius<=zom.x+zom.width &&(shoot.y+shoot.radius>=zom.y || shoot.y-shoot.radius>=zom.y+zom.height) && (shoot.y+shoot.radius<=zom.y+100 || shoot.y-shoot.radius<=zom.y+zom.height-100)){
+                healthBar[zIndex].x-=10;
+            }
+        });
     });
 }
 function playerBlockCollision () {
@@ -552,7 +614,7 @@ function playerBlockCollision () {
 function spawnBullet() {
     console.log(bulletPosition);
     setInterval(() => {
-        let speed=5;
+        let speed=15;
         let velocity={
             x:null,
             y:null
@@ -598,6 +660,33 @@ function spawnBullet() {
     }
     }
     }, 2000);
+    }
+
+    let machinGun=[];
+
+    function machineGunBullet () {
+        setInterval(()=>{
+            let speed=20;
+            let velocity={
+                x:null,
+                y:null
+            }
+            let direction = Math.floor(Math.random()*2);
+        let angle=Math.atan2(player.y,player.x);
+        if(direction==0){
+        velocity={
+            x:Math.cos(angle)*Math.random()*speed,
+            y:-Math.sin(angle*3)*Math.random()*speed
+        }
+    }
+    else{
+        velocity={
+            x:-Math.cos(angle)*Math.random()*speed,
+            y:-Math.sin(angle*3)*Math.random()*speed
+        }
+    }
+        machinGun.push(new PlayerBullet(machineGunZombies[direction].x,machineGunZombies[direction].y,10,'violet',velocity));
+        },1000);
     }
 
     function zombiePlayerCollision () {
@@ -659,6 +748,12 @@ function animate () {
         machineGunZombies[i].update();
     }
     player.update();
+    healthBar.forEach((bar)=>{
+        bar.update();
+    })
+    machinGun.forEach((gun)=>{
+        gun.update();
+    });
     standOn.forEach((stand)=>{
         if(player.y+player.height<=stand.y && player.y+player.height+player.velocity.y>=stand.y && player.x+player.width-50>=stand.x && player.x+20<=stand.x+stand.width){
             player.velocity.y=0;
@@ -693,9 +788,11 @@ function animate () {
     zombieBulletToPlayer();
     zombieBulletToObstacle();
     zombiePlayerCollision();
+    healthOfMachineZombies();
 }
 spawnEnemies();
 setTimeout(()=>{
     spawnBullet();
-},1000);
+    machineGunBullet();
+},200);
 animate();

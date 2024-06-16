@@ -55,7 +55,7 @@ let scoreArray=[];
 let closeLeaderboard=document.querySelector(".close");
 let leader=document.querySelector("#leader");
 let lBtn=document.querySelector(".leaderboard");
-let maxHealth=100;
+let maxHealth=[100,100];
 
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight-50;
@@ -358,7 +358,7 @@ class Zombies {
 }
 
 class HealthBar {
-    constructor (x,y,width,height,velocity,color,maxwidth,maxHealth){
+    constructor (x,y,width,height,velocity,color,maxwidth,maxHealth,direction){
         this.x=x;
         this.y=y;
         this.width=width;
@@ -367,6 +367,7 @@ class HealthBar {
         this.color=color;
         this.maxwidth=maxwidth
         this.maxHealth=maxHealth;
+        this.direction=direction;
     }
     draw(){
         c.beginPath();
@@ -377,7 +378,7 @@ class HealthBar {
         c.fillRect(this.x,this.y,this.width,this.height);
     }
     update(){
-        this.draw();
+        // this.draw();
         this.x+=this.velocity.x;
     }
     updateHealth(val){
@@ -394,6 +395,8 @@ let arrivingZombies=[];
 let healthBar=[];
 machineGunZombies.push(new Zombies(canvas.width,canvas.height-100,100,100,{x:-1,y:null},'pink','right'));
 machineGunZombies.push(new Zombies(0,canvas.height-100,100,100,{x:1,y:null},'pink','left'));
+healthBar.push(new HealthBar(machineGunZombies[0].x,machineGunZombies[0].y-25,100,20,machineGunZombies[0].velocity,'red',100,100,'right'));
+healthBar.push(new HealthBar(machineGunZombies[1].x,machineGunZombies[1].y-25,100,20,machineGunZombies[1].velocity,'red',100,100,'left'));
 function reSpawnGunZombies () {
     setInterval(()=>{
         if(machineGunZombies.length<2){
@@ -407,11 +410,21 @@ function reSpawnGunZombies () {
     }
 },1);
 }   
-let width=100;
-let maxwidth=100;
+
 function healthOfMachineZombies() {
-    healthBar.push(new HealthBar(machineGunZombies[0].x,machineGunZombies[0].y-25,width,20,machineGunZombies[0].velocity,'red',maxwidth,100));
-    healthBar.push(new HealthBar(machineGunZombies[1].x,machineGunZombies[1].y-25,width,20,machineGunZombies[1].velocity,'red',maxwidth,100));
+    if(healthBar.length<2){
+        if(healthBar[0].direction=='right')
+            {
+                healthBar.push(new HealthBar(machineGunZombies[1].x,machineGunZombies[1].y-25,100,20,machineGunZombies[1].velocity,'red',100,100,'left'));
+            }
+            else if (healthBar[0].direction=='left'){
+                healthBar.push(new HealthBar(machineGunZombies[1].x,machineGunZombies[1].y-25,100,20,machineGunZombies[1].velocity,'red',100,100,'right'));
+            }
+    // healthBar[0].draw();
+    // healthBar[1].draw();
+    console.log(healthBar);
+}
+else return;
 }
     
 let player=new Player(canvas.width/2,canvas.height/2,100,100,'red');
@@ -620,11 +633,15 @@ function playerBulletToZombie () {
             if(shoot.x+shoot.radius>=zom.x && shoot.x-shoot.radius<=zom.x+zom.width &&(shoot.y+shoot.radius>=zom.y || shoot.y-shoot.radius>=zom.y+zom.height) && (shoot.y+shoot.radius<=zom.y+100 || shoot.y-shoot.radius<=zom.y+zom.height-100)){
                 console.log(healthBar[zIndex].width);
                 if(!shoot.hasCollided){
-                    maxHealth-=10;
-                healthBar[zIndex].updateHealth(maxHealth);
+                    maxHealth[zIndex]-=10;
+                healthBar[zIndex].updateHealth(maxHealth[zIndex]);
+                if(maxHealth[zIndex]==0){
+                    healthBar.splice(zIndex,1);
+                    machineGunZombies.splice(zIndex,1);
+                    maxHealth[zIndex]=100;
+                }
                 shoot.hasCollided=true;
             }
-                // machineGunZombies.splice(zIndex,1);
             }
         });
     });
@@ -724,7 +741,6 @@ function spawnBullet() {
                 if(healthScore==0){
                     alert('game over');
                     cancelAnimationFrame(animationFrameID);
-
                 }
                 e.collisionStatus='collided';
             }
@@ -736,7 +752,6 @@ function spawnBullet() {
                 if(healthScore==0){
                     alert('game over');
                     cancelAnimationFrame(animationFrameID);
-
                 }
                 er.collisionStatus='collided';
             }
@@ -748,7 +763,6 @@ function spawnBullet() {
                 if(healthScore==0){
                     alert('game over');
                     cancelAnimationFrame(animationFrameID);
-
                 }
                 zom.collisionStatus='collided';
             }
@@ -789,8 +803,9 @@ function animate () {
     }
     player.update();
     healthBar.forEach((bar)=>{
+        bar.draw();
         bar.update();
-    })
+    });
     machinGun.forEach((gun)=>{
         gun.update();
     });

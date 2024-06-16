@@ -78,10 +78,28 @@
         .close:hover{
             background-color: red;
         }
+        .time-left{
+            color: black;
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            font-size: xx-large;
+            font-weight: bolder;
+            margin-left: 150px;
+            visibility: hidden;
+        }
     </style>
 </head>
 <body><div class="all">
     <div class="score">SCORE : <span id="point">0</span></div><div class="pause">PAUSE</div> <div class="play">PLAY</div><div class="reset">RESET</div><div class="leaderboard">LEADERBOARD</div><div class="health">HEALTH : <span id="health-status">100%</span></div>
+</div>
+<div class="time-left">
+<span class="exact-time"></span>
 </div>
 <div class="score-details"><div id="leader">LEADERBOARD<div class="close">CLOSE</div></div></div>
     <canvas></canvas>

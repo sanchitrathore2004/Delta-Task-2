@@ -26,6 +26,12 @@ plank.src='./plank.png';
 const gunZombie=new Image();
 gunZombie.src='./machine gun zombie 2.png';
 
+const bandage=new Image();
+bandage.src='./bandages.png';
+
+const immune=new Image();
+immune.src='./immune.png';
+
 function drawBackground() {
     c.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 }
@@ -56,6 +62,9 @@ let closeLeaderboard=document.querySelector(".close");
 let leader=document.querySelector("#leader");
 let lBtn=document.querySelector(".leaderboard");
 let maxHealth=[100,100];
+let angle=0;
+let healthFlag=true;
+let exactTime=document.querySelector(".exact-time");
 
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight-50;
@@ -388,6 +397,26 @@ class HealthBar {
     }
 }
 
+// class AllText {
+//     constructor(x,y,font,color,text){
+//         this.x=x;
+//         this.y=y;
+//         this.font=font;
+//         this.color=color;
+//         this.text=text;
+//     }
+//     draw(){
+//     c.font = this.font;
+//     c.fillStyle = this.color;
+    
+//     c.fillText(this.text,this.x,this.y);
+//     c.strokeStyle = 'white';
+//     c.strokeText(this.text,this.x,this.y);
+//     }
+// }
+
+// let timerMsg=new AllText(10,110,'10px Arial','white','PRESS B');
+
 let bullets=[];
 let playerShoot=[];
 let machineGunZombies=[];
@@ -426,7 +455,7 @@ function healthOfMachineZombies() {
 }
 else return;
 }
-    
+
 let player=new Player(canvas.width/2,canvas.height/2,100,100,'red');
 let platform1=new Plank(canvas.width/2,4*canvas.height/5,20,200,'blue');
 let platform2=new Pillar(canvas.width/3,canvas.height-200,200,40,'blue');
@@ -462,7 +491,8 @@ addEventListener('click', (event) => {
         y:Math.sin(angle)*speed
     }
     playerShoot.push(new PlayerBullet(player.x+100,player.y+50,10,'pink',velocity,false));
-})
+});
+let bCheck=false;
 addEventListener('keydown', (event) => {
     let keyCode=event.keyCode;
     console.log(keyCode);
@@ -483,7 +513,15 @@ addEventListener('keydown', (event) => {
             if(player.velocity.y==0){
             player.velocity.y-=10;
         }
+        break;
+        case 66:
+            console.log('bandages');
+            timingFunction(5);
             break;
+            case 73:
+                console.log('immunity activated');
+                healthFlag=false;
+                break;
     }
 });
 
@@ -507,6 +545,24 @@ addEventListener('keyup', (event) => {
             break;
     }
 });
+
+function timingFunction (timeInput){
+    let sec=timeInput;
+    setInterval(()=>{
+        if(healthScore+10<=100){
+            exactTime.style.visibility='visible';
+    if(sec<=5){
+        sec-=1;
+        exactTime.innerHTML=`APPLYING BANDAGES : ${sec}`;
+        if(sec==0){
+            exactTime.style.visibility='hidden';
+                healthScore+=10;
+                healthStatus.innerHTML=`${healthScore}%`;
+        }
+    }
+}
+    },1000); 
+}
 
 let bulletPosition=[];
 
@@ -533,9 +589,6 @@ function zombieBulletToObstacle() {
             if(bullet.velocity.x>0){
                 if(bullet.x+bullet.radius>=plat.x && bullet.x-bullet.radius<=plat.x+plat.width && bullet.y+bullet.radius>=plat.y && bullet.y-bullet.radius<=plat.y+plat.height){
                     bullets.splice(bullIndex,1);
-                    // plat.width-=33.33;
-                    // plat.height-=33.33;
-                    // if(plat.height<=1){
                     platforms.splice(platIndex,1);
                 
                 }
@@ -543,9 +596,6 @@ function zombieBulletToObstacle() {
             else if(bullet.velocity.x<0){
                 if(bullet.x-bullet.radius<=plat.x+plat.width && bullet.x+bullet.radius>=plat.x && bullet.y+bullet.radius>=plat.y && bullet.y-bullet.radius<=plat.y+plat.height){
                     bullets.splice(bullIndex,1)
-                    // plat.width-=33.33;
-                    // plat.height-=33.33;
-                    // if(plat.height<=1){
                     platforms.splice(platIndex,1);
                 
                 }
@@ -559,8 +609,10 @@ function zombieBulletToPlayer () {
         if(b.velocity.x>0){
         if(b.x+b.radius>=player.x && b.x-b.radius<=player.x+player.width && b.y+b.radius>=player.y && b.y-b.radius<=player.y+player.height){
             bullets.splice(index,1);
+            if(healthFlag){
             healthScore-=25;
             healthStatus.innerHTML=`${healthScore}%`;
+        }
             if(healthScore==0){
             alert('Game over');
             cancelAnimationFrame(animationFrameID);
@@ -571,8 +623,10 @@ function zombieBulletToPlayer () {
     else{
         if(b.x-b.radius<=player.x+player.width && b.x+b.radius>=player.x && b.y+b.radius>=player.y && b.y-b.radius<=player.y+player.height){
             bullets.splice(index,1);
-            healthScore-=25;
-            healthStatus.innerHTML=`${healthScore}%`;
+            if(healthFlag){
+                healthScore-=25;
+                healthStatus.innerHTML=`${healthScore}%`;
+            }
             if(healthScore==0){
             alert('Game over');
             cancelAnimationFrame(animationFrameID);
@@ -585,8 +639,10 @@ function zombieBulletToPlayer () {
         if(gun.velocity.x>0){
             if(gun.x+gun.radius>=player.x && gun.x-gun.radius<=player.x+player.width && gun.y+gun.radius>=player.y && gun.y-gun.radius<=player.y+player.height){
                 machinGun.splice(gIndex,1);
-                healthScore-=25;
-                healthStatus.innerHTML=`${healthScore}%`;
+                if(healthFlag){
+                    healthScore-=25;
+                    healthStatus.innerHTML=`${healthScore}%`;
+                }
             if(healthScore==0){
             alert('Game over');
             cancelAnimationFrame(animationFrameID);
@@ -596,8 +652,10 @@ function zombieBulletToPlayer () {
     else if (gun.velocity.x<0){
         if(gun.x-gun.radius<=player.x+player.width && gun.x+gun.radius>=player.x && gun.y+gun.radius>=player.y && gun.y-gun.radius<=player.y+player.height){
             machinGun.splice(gIndex,1);
-            healthScore-=25;
+            if(healthFlag){
+                healthScore-=25;
                 healthStatus.innerHTML=`${healthScore}%`;
+            }
             if(healthScore==0){
             alert('Game over');
             cancelAnimationFrame(animationFrameID);
@@ -695,7 +753,7 @@ function spawnBullet() {
             if(bulletPosition[aIndex].y+bulletPosition[aIndex].height+50<canvas.height){
             bullets.push(new Bullet(arrivingZombies[aIndex].x+arrivingZombies[aIndex].width,arrivingZombies[aIndex].y+arrivingZombies[aIndex].height*Math.random(),10,'black',velocity));
         }
-            
+
             return;
         }
         else{
@@ -736,8 +794,10 @@ function spawnBullet() {
     function zombiePlayerCollision () {
         enemy.forEach((e)=>{
             if(e.collisionStatus=='not collided' && e.x+e.width>=player.x && e.y+e.height>=player.y && e.y<=player.y+player.height && e.x<=player.x+player.width){
-                healthScore-=25;
-                healthStatus.innerHTML=`${healthScore}%`;
+                if(healthFlag){
+                    healthScore-=25;
+                    healthStatus.innerHTML=`${healthScore}%`;
+                }
                 if(healthScore==0){
                     alert('game over');
                     cancelAnimationFrame(animationFrameID);
@@ -747,8 +807,10 @@ function spawnBullet() {
         });
         enemyRight.forEach((er)=>{
             if(er.x<=player.x+player.width && er.x+er.width>=player.x && er.y+er.height>=player.y && er.y<=player.y+player.height && er.collisionStatus=='not collided'){
-                healthScore-=25;
-                healthStatus.innerHTML=`${healthScore}%`;
+                if(healthFlag){
+                    healthScore-=25;
+                    healthStatus.innerHTML=`${healthScore}%`;
+                }
                 if(healthScore==0){
                     alert('game over');
                     cancelAnimationFrame(animationFrameID);
@@ -758,8 +820,10 @@ function spawnBullet() {
         });
         machineGunZombies.forEach((zom)=>{
             if(zom.x<=player.x+player.width && zom.x+zom.width>=player.x && zom.y+zom.height>=player.y && zom.y<=player.y+player.height && zom.collisionStatus=='not collided'){
-                healthScore-=25;
-                healthStatus.innerHTML=`${healthScore}%`;
+                if(healthFlag){
+                    healthScore-=25;
+                    healthStatus.innerHTML=`${healthScore}%`;
+                }
                 if(healthScore==0){
                     alert('game over');
                     cancelAnimationFrame(animationFrameID);
@@ -801,7 +865,10 @@ function animate () {
     for(let i=0;i<machineGunZombies.length;i++){
         machineGunZombies[i].update();
     }
+    // timerMsg.draw();
     player.update();
+    c.drawImage(bandage,10,10,70,70);
+    c.drawImage(immune,10,90,70,70);
     healthBar.forEach((bar)=>{
         bar.draw();
         bar.update();
@@ -847,7 +914,7 @@ function animate () {
 }
 spawnEnemies();
 setTimeout(()=>{
-    spawnBullet();
-    machineGunBullet();
+    // spawnBullet();
+    // machineGunBullet();
 },200);
 animate();

@@ -32,6 +32,15 @@ bandage.src='./bandages.png';
 const immune=new Image();
 immune.src='./immune.png';
 
+const shotGun=new Image();
+shotGun.src='./shotgun.png';
+
+const machineGun=new Image();
+machineGun.src='./akm.png';
+
+const characterLeft=new Image();
+characterLeft.src='./characterleft.png';
+
 function drawBackground() {
     c.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 }
@@ -73,6 +82,7 @@ let giftX=[];
 let giftY=[];
 let giftFlag=false;
 let giftProbability;
+let gunChoice=1;
 
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight-50;
@@ -102,6 +112,9 @@ let keys = {
     },
     left: {
         pressed: false
+    },
+    leftMouseButton: {
+        pressed: false
     }
 };
 
@@ -116,13 +129,18 @@ class Player{
             x:0,
             y:0
         };
+        this.direction={
+            left: characterLeft,
+            right:character
+        }
+        this.face=this.direction.right;
     }
 
     draw() {
         // c.beginPath();
         // c.fillStyle=this.color;
         // c.fillRect(this.x,this.y,this.width,this.height);
-        c.drawImage(character,this.x,this.y,this.width,this.height);
+        c.drawImage(this.face,this.x,this.y,this.width,this.height);
     }
 
     update() {
@@ -491,6 +509,7 @@ for(let i=4;i<=13;i++){
 console.log(platforms);
 
 addEventListener('click', (event) => {
+    if(gunChoice==1){
     let angle;
     angle=Math.atan2(event.clientY-player.y,event.clientX-player.x);
     let speed=10;
@@ -499,7 +518,26 @@ addEventListener('click', (event) => {
         y:Math.sin(angle)*speed
     }
     playerShoot.push(new PlayerBullet(player.x+100,player.y+50,10,'pink',velocity,false));
+}
 });
+addEventListener('mousedown',(event) => {
+    if(gunChoice==2){
+    let intervalID=setInterval(()=>{
+        let angle;
+    angle=Math.atan2(event.clientY-player.y,event.clientX-player.x);
+    let speed=10;
+    let velocity={
+        x:Math.cos(angle)*speed,
+        y:Math.sin(angle)*speed
+    }
+    playerShoot.push(new PlayerBullet(player.x+100,player.y+50,10,'pink',velocity,false));
+    },100);
+    setTimeout(()=>{
+        clearInterval(intervalID);
+    },1000);
+}
+});
+
 let bCheck=false;
 addEventListener('keydown', (event) => {
     let keyCode=event.keyCode;
@@ -530,6 +568,12 @@ addEventListener('keydown', (event) => {
             console.log('immunity activated');
             healthFlag=false;
             timingFunction(15,'not done');
+            break;
+        case 49:
+            gunChoice=1;
+            break;
+        case 50:
+            gunChoice=2;
             break;
     }
 });
@@ -928,9 +972,11 @@ function animate () {
         machineGunZombies[i].update();
     }
     // timerMsg.draw();
-    player.update();
     c.drawImage(bandage,10,10,70,70);
     c.drawImage(immune,10,90,70,70);
+    c.drawImage(shotGun,canvas.width-300,10,290,80);
+    c.drawImage(machineGun,canvas.width-300,90,290,100);
+    player.update();
     healthBar.forEach((bar)=>{
         bar.draw();
         bar.update();
@@ -950,9 +996,11 @@ function animate () {
         shoot.update();
     });
     if(keys.left.pressed){
+        player.face=player.direction.left;
         player.velocity.x=-5;
     }
     else if(keys.right.pressed){
+        player.face=player.direction.right;
         player.velocity.x=5;
     }
     else player.velocity.x=0;
@@ -977,7 +1025,7 @@ function animate () {
 }
 spawnEnemies();
 setTimeout(()=>{
-    spawnBullet();
-    machineGunBullet();
+    // spawnBullet();
+    // machineGunBullet();
 },200);
 animate();

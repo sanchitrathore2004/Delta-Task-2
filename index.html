@@ -140,6 +140,24 @@
             margin-top: 170px;
             user-select: none;
         }
+        .akm-bullets{
+            color: white;
+            position: absolute;
+            margin-left: 79%;
+            margin-top: 110px;
+            font-size: large;
+            font-weight: bold;
+            user-select: none;
+        }
+        .shotgun-bullets{
+            color: white;
+            position: absolute;
+            margin-left: 79%;
+            margin-top: 10px;
+            font-size: large;
+            font-weight: bold;
+            user-select: none;
+        }
     </style>
 </head>
 <body><div class="all">
@@ -149,11 +167,14 @@
 <div class="immunity">x0</div><div class="press-i">(PRESS I)</div>
 <div class="press-1">(PRESS 1)</div>
 <div class="press-2">(PRESS 2)</div>
+<div class="akm-bullets">AMMO : 50</div>
+<div class="shotgun-bullets">AMMO : ∞</div>
 <div class="time-left">
 <span class="exact-time"></span>
 </div>
 <div class="score-details"><div id="leader">LEADERBOARD<div class="close">CLOSE</div></div></div>
     <canvas></canvas>
+    <audio id="shotgun-sound" src="Pubg - Shotgun Tone.mp3"></audio>
     <script type="module" src="canvas.js"></script>
 </body>
 </html>

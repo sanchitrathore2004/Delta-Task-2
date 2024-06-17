@@ -83,6 +83,9 @@ let giftY=[];
 let giftFlag=false;
 let giftProbability;
 let gunChoice=1;
+let akmAmmo=document.querySelector(".akm-bullets");
+let akmAmmoCurr=50;
+let shotGunSound=document.querySelector('#shotgun-sound');
 
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight-50;
@@ -517,11 +520,12 @@ addEventListener('click', (event) => {
         x:Math.cos(angle)*speed,
         y:Math.sin(angle)*speed
     }
+    // shotGunSound.play();
     playerShoot.push(new PlayerBullet(player.x+100,player.y+50,10,'pink',velocity,false));
 }
 });
 addEventListener('mousedown',(event) => {
-    if(gunChoice==2){
+    if(gunChoice==2 && akmAmmoCurr>0){
     let intervalID=setInterval(()=>{
         let angle;
     angle=Math.atan2(event.clientY-player.y,event.clientX-player.x);
@@ -530,6 +534,8 @@ addEventListener('mousedown',(event) => {
         x:Math.cos(angle)*speed,
         y:Math.sin(angle)*speed
     }
+    akmAmmoCurr--;
+    akmAmmo.innerHTML=`AMMO : ${akmAmmoCurr}`;
     playerShoot.push(new PlayerBullet(player.x+100,player.y+50,10,'pink',velocity,false));
     },100);
     setTimeout(()=>{
@@ -776,6 +782,8 @@ function playerBulletToZombie () {
                     maxHealth[zIndex]-=10;
                 healthBar[zIndex].updateHealth(maxHealth[zIndex]);
                 if(maxHealth[zIndex]==0){
+                    setScore+=200;
+                    points.innerHTML=setScore;
                     healthBar.splice(zIndex,1);
                     giftProbability=Math.random()*10;
                     console.log(giftProbability);
@@ -1025,7 +1033,7 @@ function animate () {
 }
 spawnEnemies();
 setTimeout(()=>{
-    // spawnBullet();
-    // machineGunBullet();
+    spawnBullet();
+    machineGunBullet();
 },200);
 animate();

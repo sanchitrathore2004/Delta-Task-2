@@ -29,6 +29,7 @@
             font-weight: bold;
             font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
             user-select: none;
+            border-radius: 5px;
             transition: background-color 0.5s, color 0.5s ease;
         }
         .pause:hover,
@@ -93,11 +94,31 @@
             margin-left: 150px;
             visibility: hidden;
         }
+        .bandage{
+            color: white;
+            position: absolute;
+            font-size: x-large;
+            font-weight: bold;
+            margin-top: 60px;
+            margin-left: 80px;
+            user-select: none;
+        }
+        .immunity{
+            color: white;
+            position: absolute;
+            font-size: x-large;
+            font-weight: bold;
+            margin-top: 130px;
+            margin-left: 80px;
+            user-select: none;
+        }
     </style>
 </head>
 <body><div class="all">
     <div class="score">SCORE : <span id="point">0</span></div><div class="pause">PAUSE</div> <div class="play">PLAY</div><div class="reset">RESET</div><div class="leaderboard">LEADERBOARD</div><div class="health">HEALTH : <span id="health-status">100%</span></div>
 </div>
+<div class="bandage">x5</div>
+<div class="immunity">x0</div>
 <div class="time-left">
 <span class="exact-time"></span>
 </div>

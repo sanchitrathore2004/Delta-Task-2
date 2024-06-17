@@ -65,6 +65,14 @@ let maxHealth=[100,100];
 let angle=0;
 let healthFlag=true;
 let exactTime=document.querySelector(".exact-time");
+let numberOfBandages=document.querySelector(".bandage");
+let initialBandage=5;
+let numberOfImmunity=document.querySelector(".immunity");
+let initialImmunity=0;
+let giftX=[];
+let giftY=[];
+let giftFlag=false;
+let giftProbability;
 
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight-50;
@@ -516,12 +524,13 @@ addEventListener('keydown', (event) => {
         break;
         case 66:
             console.log('bandages');
-            timingFunction(5);
+            timingFunction(5,'not done');
             break;
-            case 73:
-                console.log('immunity activated');
-                healthFlag=false;
-                break;
+        case 73:
+            console.log('immunity activated');
+            healthFlag=false;
+            timingFunction(15,'not done');
+            break;
     }
 });
 
@@ -543,25 +552,54 @@ addEventListener('keyup', (event) => {
         case 87:
             console.log('up');
             break;
+        case 66:
+            break;
     }
 });
 
-function timingFunction (timeInput){
+function timingFunction (timeInput,work){
     let sec=timeInput;
-    setInterval(()=>{
-        if(healthScore+10<=100){
+    if(sec==5){
+    exactTime.innerHTML="";
+    if(healthScore+10<=100 && initialBandage>0){
+    let intervalID=setInterval(()=>{
+        if(work=='not done'){
             exactTime.style.visibility='visible';
     if(sec<=5){
         sec-=1;
-        exactTime.innerHTML=`APPLYING BANDAGES : ${sec}`;
+        exactTime.innerHTML=`APPLYING BANDAGES : ${sec} Seconds`;
         if(sec==0){
             exactTime.style.visibility='hidden';
                 healthScore+=10;
                 healthStatus.innerHTML=`${healthScore}%`;
+                initialBandage-=1;
+                numberOfBandages.innerHTML=`x${initialBandage}`;
+                work='done';
+                return;
         }
     }
 }
     },1000); 
+}
+}
+else if (sec==15 && initialImmunity>0){
+    exactTime.style.visibility='visible';
+    exactTime.innerHTML="";
+    setInterval(()=>{
+        if(work=='not done'){
+        sec-=1;
+        exactTime.innerHTML=`IMMUNITY ACTIVATED FOR : ${sec} Seconds`;
+        if(sec==0){
+            exactTime.style.visibility='hidden';
+            healthFlag=true;
+            initialImmunity--;
+            numberOfImmunity.innerHTML=`x${initialImmunity}`;
+            work='done';
+            return;
+        }
+    }
+    },1000);
+}
 }
 
 let bulletPosition=[];
@@ -695,6 +733,13 @@ function playerBulletToZombie () {
                 healthBar[zIndex].updateHealth(maxHealth[zIndex]);
                 if(maxHealth[zIndex]==0){
                     healthBar.splice(zIndex,1);
+                    giftProbability=Math.random()*10;
+                    console.log(giftProbability);
+                    if(giftProbability>=7){
+                        giftX.push(machineGunZombies[zIndex].x);
+                        giftY.push(machineGunZombies[zIndex].y+30);
+                        giftFlag=true;
+                    }
                     machineGunZombies.splice(zIndex,1);
                     maxHealth[zIndex]=100;
                 }
@@ -792,12 +837,11 @@ function spawnBullet() {
     }
 
     function zombiePlayerCollision () {
+        if(healthFlag){
         enemy.forEach((e)=>{
             if(e.collisionStatus=='not collided' && e.x+e.width>=player.x && e.y+e.height>=player.y && e.y<=player.y+player.height && e.x<=player.x+player.width){
-                if(healthFlag){
-                    healthScore-=25;
+                    healthScore-=10;
                     healthStatus.innerHTML=`${healthScore}%`;
-                }
                 if(healthScore==0){
                     alert('game over');
                     cancelAnimationFrame(animationFrameID);
@@ -807,10 +851,8 @@ function spawnBullet() {
         });
         enemyRight.forEach((er)=>{
             if(er.x<=player.x+player.width && er.x+er.width>=player.x && er.y+er.height>=player.y && er.y<=player.y+player.height && er.collisionStatus=='not collided'){
-                if(healthFlag){
-                    healthScore-=25;
+                    healthScore-=10;
                     healthStatus.innerHTML=`${healthScore}%`;
-                }
                 if(healthScore==0){
                     alert('game over');
                     cancelAnimationFrame(animationFrameID);
@@ -820,10 +862,8 @@ function spawnBullet() {
         });
         machineGunZombies.forEach((zom)=>{
             if(zom.x<=player.x+player.width && zom.x+zom.width>=player.x && zom.y+zom.height>=player.y && zom.y<=player.y+player.height && zom.collisionStatus=='not collided'){
-                if(healthFlag){
-                    healthScore-=25;
+                    healthScore-=10;
                     healthStatus.innerHTML=`${healthScore}%`;
-                }
                 if(healthScore==0){
                     alert('game over');
                     cancelAnimationFrame(animationFrameID);
@@ -831,6 +871,18 @@ function spawnBullet() {
                 zom.collisionStatus='collided';
             }
         });
+    }
+    }
+
+    function giftPlayerCollision () {
+        for(let i=0;i<giftX.length;i++){
+            if(player.x+player.width>=giftX[i] && player.x<=giftX[i]+60 && player.y+player.height>=giftY[i] && player.y<=giftY[i]+60){
+                giftX.splice(i,1);
+                giftY.splice(i,1);
+                initialImmunity++;
+                numberOfImmunity.innerHTML=`x${initialImmunity}`;
+            }
+        }
     }
 
 pauseBtn.addEventListener('click', ()=>{
@@ -861,6 +913,16 @@ function animate () {
     }
     for(let i=0;i<enemyRight.length;i++){
         enemyRight[i].update();
+    }
+    if(giftFlag){
+        for(let i=0;i<giftX.length;i++)
+            {
+                c.drawImage(immune,giftX[i],giftY[i],60,60);
+                setTimeout(()=>{
+                    giftX.splice(i,1);
+                    giftY.splice(i,1);
+                },10000);
+            }
     }
     for(let i=0;i<machineGunZombies.length;i++){
         machineGunZombies[i].update();
@@ -911,6 +973,7 @@ function animate () {
     zombieBulletToObstacle();
     zombiePlayerCollision();
     healthOfMachineZombies();
+    giftPlayerCollision();
 }
 spawnEnemies();
 setTimeout(()=>{

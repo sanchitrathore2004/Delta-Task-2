@@ -88,12 +88,20 @@ let giftProbability;
 let gunChoice=1;
 let akmAmmo=document.querySelector(".akm-bullets");
 let akmAmmoCurr=50;
-let shotGunSound=document.querySelector('#shotgun-sound');
 let leaderboardArray=[];
 let ammoX=[];
 let ammoY=[];
 let ammoFlag=false;
 let ammoProbability;
+let jumpSound=document.querySelector('#jump');
+let bandageSound=document.querySelector('#bandage');
+let damageSound=document.querySelector('#damage');
+let pickupSound=document.querySelector('#pickup');
+let gunChangeSound=document.querySelector('#gunchange');
+let gameoverSound=document.querySelector('#gameover');
+let shotGunSound=document.querySelector('#shotgun');
+let emptygunSound=document.querySelector('#emptygun');
+let machinegunSound=document.querySelector('#machinegun');
 console.log(closeLeaderboard);
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight-50;
@@ -522,6 +530,7 @@ console.log(platforms);
 
 addEventListener('click', (event) => {
     if(gunChoice==1){
+        shotGunSound.play();
     let angle;
     angle=Math.atan2(event.clientY-player.y,event.clientX-player.x);
     let speed=10;
@@ -535,6 +544,7 @@ addEventListener('click', (event) => {
 });
 addEventListener('mousedown',(event) => {
     if(gunChoice==2 && akmAmmoCurr>0){
+        machinegunSound.play();
     let intervalID=setInterval(()=>{
         let angle;
     angle=Math.atan2(event.clientY-player.y,event.clientX-player.x);
@@ -550,6 +560,9 @@ addEventListener('mousedown',(event) => {
     setTimeout(()=>{
         clearInterval(intervalID);
     },1000);
+}
+if(gunChoice==2 && akmAmmoCurr==0){
+    emptygunSound.play();
 }
 });
 
@@ -572,6 +585,7 @@ addEventListener('keydown', (event) => {
         case 87:
             console.log('up');
             if(player.velocity.y==0){
+                jumpSound.play();
             player.velocity.y-=10;
         }
         break;
@@ -585,9 +599,11 @@ addEventListener('keydown', (event) => {
             timingFunction(15,'not done');
             break;
         case 49:
+            gunChangeSound.play();
             gunChoice=1;
             break;
         case 50:
+            gunChangeSound.play();
             gunChoice=2;
             break;
     }
@@ -621,6 +637,7 @@ function timingFunction (timeInput,work){
     if(sec==5){
     exactTime.innerHTML="";
     if(healthScore+10<=100 && initialBandage>0){
+        bandageSound.play();
     let intervalID=setInterval(()=>{
         if(work=='not done'){
             exactTime.style.visibility='visible';
@@ -707,11 +724,13 @@ function zombieBulletToPlayer () {
         if(b.x+b.radius>=player.x && b.x-b.radius<=player.x+player.width && b.y+b.radius>=player.y && b.y-b.radius<=player.y+player.height){
             bullets.splice(index,1);
             if(healthFlag){
+                damageSound.play();
             healthScore-=10;
             healthStatus.innerHTML=`${healthScore}%`;
         }
             if(healthScore<=0){
                 saveScore(setScore);
+                gameoverSound.play();
             alert('Game over');
             cancelAnimationFrame(animationFrameID);
 
@@ -722,10 +741,12 @@ function zombieBulletToPlayer () {
         if(b.x-b.radius<=player.x+player.width && b.x+b.radius>=player.x && b.y+b.radius>=player.y && b.y-b.radius<=player.y+player.height){
             bullets.splice(index,1);
             if(healthFlag){
+                damageSound.play();
                 healthScore-=10;
                 healthStatus.innerHTML=`${healthScore}%`;
             }
             if(healthScore<=0){
+                gameoverSound.play();
                 saveScore(setScore);
             alert('Game over');
             cancelAnimationFrame(animationFrameID);
@@ -739,10 +760,12 @@ function zombieBulletToPlayer () {
             if(gun.x+gun.radius>=player.x && gun.x-gun.radius<=player.x+player.width && gun.y+gun.radius>=player.y && gun.y-gun.radius<=player.y+player.height){
                 machinGun.splice(gIndex,1);
                 if(healthFlag){
+                    damageSound.play();
                     healthScore-=10;
                     healthStatus.innerHTML=`${healthScore}%`;
                 }
             if(healthScore<=0){
+                gameoverSound.play();
                 saveScore(setScore);
             alert('Game over');
             cancelAnimationFrame(animationFrameID);
@@ -753,10 +776,12 @@ function zombieBulletToPlayer () {
         if(gun.x-gun.radius<=player.x+player.width && gun.x+gun.radius>=player.x && gun.y+gun.radius>=player.y && gun.y-gun.radius<=player.y+player.height){
             machinGun.splice(gIndex,1);
             if(healthFlag){
+                damageSound.play();
                 healthScore-=10;
                 healthStatus.innerHTML=`${healthScore}%`;
             }
             if(healthScore<=0){
+                gameoverSound.play();
                 saveScore(setScore);
             alert('Game over');
             cancelAnimationFrame(animationFrameID);
@@ -917,9 +942,11 @@ function spawnBullet() {
         if(healthFlag){
         enemy.forEach((e)=>{
             if(e.collisionStatus=='not collided' && e.x+e.width>=player.x && e.y+e.height>=player.y && e.y<=player.y+player.height && e.x<=player.x+player.width){
+                damageSound.play();
                     healthScore-=10;
                     healthStatus.innerHTML=`${healthScore}%`;
                 if(healthScore<=0){
+                    gameoverSound.play();
                     saveScore(setScore);
                     alert('game over');
                     cancelAnimationFrame(animationFrameID);
@@ -929,9 +956,11 @@ function spawnBullet() {
         });
         enemyRight.forEach((er)=>{
             if(er.x<=player.x+player.width && er.x+er.width>=player.x && er.y+er.height>=player.y && er.y<=player.y+player.height && er.collisionStatus=='not collided'){
+                damageSound.play();
                     healthScore-=10;
                     healthStatus.innerHTML=`${healthScore}%`;
                 if(healthScore<=0){
+                    gameoverSound.play();
                     saveScore(setScore);
                     alert('game over');
                     cancelAnimationFrame(animationFrameID);
@@ -941,9 +970,11 @@ function spawnBullet() {
         });
         machineGunZombies.forEach((zom)=>{
             if(zom.x<=player.x+player.width && zom.x+zom.width>=player.x && zom.y+zom.height>=player.y && zom.y<=player.y+player.height && zom.collisionStatus=='not collided'){
+                damageSound.play();
                     healthScore-=10;
                     healthStatus.innerHTML=`${healthScore}%`;
                 if(healthScore<=0){
+                    gameoverSound.play();
                     saveScore(setScore);
                     alert('game over');
                     cancelAnimationFrame(animationFrameID);
@@ -959,6 +990,7 @@ function spawnBullet() {
             if(player.x+player.width>=giftX[i] && player.x<=giftX[i]+60 && player.y+player.height>=giftY[i] && player.y<=giftY[i]+60){
                 giftX.splice(i,1);
                 giftY.splice(i,1);
+                pickupSound.play();
                 initialImmunity++;
                 numberOfImmunity.innerHTML=`x${initialImmunity}`;
             }
@@ -967,6 +999,7 @@ function spawnBullet() {
             if(player.x+player.width>=ammoX[i] && player.x<=ammoX[i]+60 && player.y+player.height>=ammoY[i] && player.y<=ammoY[i]+60){
                 ammoX.splice(i,1);
                 ammoY.splice(i,1);
+                pickupSound.play();
                 akmAmmoCurr+=10;
                 akmAmmo.innerHTML=`AMMO : ${akmAmmoCurr}`;
             }

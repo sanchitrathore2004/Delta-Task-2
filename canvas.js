@@ -1102,7 +1102,7 @@ function animate () {
 }
 spawnEnemies();
 setTimeout(()=>{
-    // spawnBullet();
-    // machineGunBullet();
+    spawnBullet();
+    machineGunBullet();
 },200);
 animate();

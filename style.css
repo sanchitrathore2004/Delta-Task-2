@@ -1,0 +1,154 @@
+body{
+    margin: 0;
+    background-color: black;
+}
+.all{
+    display: flex;
+    padding: 5px;
+    justify-content: space-between;
+    /* position: absolute; */
+}
+.score,
+.health,
+.timer,
+.pause,
+.play,
+.reset,
+.leaderboard{
+    padding: 3px;
+    color: white;
+    /* position: absolute; */
+    font-size: x-large;
+    font-weight: bold;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    user-select: none;
+    border-radius: 5px;
+    transition: background-color 0.5s, color 0.5s ease;
+}
+.pause:hover,
+.play:hover,
+.reset:hover,
+.leaderboard:hover{
+    cursor: pointer;
+    background-color: bisque;
+    color: black;
+}
+.score-details{
+    /* background-color: white; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    height: 90%;
+    position: absolute;
+}
+.score-details>div{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* justify-content: space-between; */
+    padding: 5px;
+    /* justify-content: center; */
+    background-color: rgba(13, 177, 192, 0.692);
+    color: rgb(0, 0, 0);
+    font-size: x-large;
+    font-weight: bold;
+    border: 2px solid black;
+    border-radius: 5px;
+    width: 20rem;
+    height: 25rem;
+    visibility: hidden;
+    margin-left: 15%;
+}
+.close{
+    font-size: small;
+    background-color: antiquewhite;
+    padding: 5px;
+    border: 2px solid black;
+    border-radius: 2px;
+    cursor: pointer;
+    display: flex;
+    transition: background-color 0.5s ease;
+}
+.close:hover{
+    background-color: red;
+}
+.time-left{
+    color: black;
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: xx-large;
+    font-weight: bolder;
+    margin-left: 150px;
+    visibility: hidden;
+}
+.bandage{
+    color: white;
+    position: absolute;
+    font-size: x-large;
+    font-weight: bold;
+    margin-top: 60px;
+    margin-left: 80px;
+    user-select: none;
+}
+.immunity{
+    color: white;
+    position: absolute;
+    font-size: x-large;
+    font-weight: bold;
+    margin-top: 130px;
+    margin-left: 80px;
+    user-select: none;
+}
+.press-b{
+    color: white;
+    position: absolute;
+    margin-top: 65px;
+    margin-left: 110px;
+    user-select: none;
+}
+.press-i{
+    color: white;
+    position: absolute;
+    margin-top: 135px;
+    margin-left: 110px;
+    user-select: none;
+}
+.press-1{
+    color: white;
+    position: absolute;
+    margin-left: 95%;
+    margin-top: 40px;
+    user-select: none;
+}
+.press-2{
+    color: white;
+    position: absolute;
+    margin-left: 95%;
+    margin-top: 170px;
+    user-select: none;
+}
+.akm-bullets{
+    color: white;
+    position: absolute;
+    margin-left: 79%;
+    margin-top: 110px;
+    font-size: large;
+    font-weight: bold;
+    user-select: none;
+}
+.shotgun-bullets{
+    color: white;
+    position: absolute;
+    margin-left: 79%;
+    margin-top: 10px;
+    font-size: large;
+    font-weight: bold;
+    user-select: none;
+}

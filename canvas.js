@@ -44,6 +44,9 @@ characterLeft.src='./characterleft.png';
 const ammo=new Image();
 ammo.src='./ammo.png';
 
+const jetPack=new Image();
+jetPack.src='./jetpack.png';
+
 function drawBackground() {
     c.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 }
@@ -88,6 +91,10 @@ let giftProbability;
 let gunChoice=1;
 let akmAmmo=document.querySelector(".akm-bullets");
 let akmAmmoCurr=50;
+let numOfJetPack=0;
+let jetFlag=false;
+let jetPacks=document.querySelector(".jetpack");
+let jetPackArray=[];
 let leaderboardArray=[];
 let ammoX=[];
 let ammoY=[];
@@ -443,25 +450,26 @@ class HealthBar {
     }
 }
 
-// class AllText {
-//     constructor(x,y,font,color,text){
-//         this.x=x;
-//         this.y=y;
-//         this.font=font;
-//         this.color=color;
-//         this.text=text;
-//     }
-//     draw(){
-//     c.font = this.font;
-//     c.fillStyle = this.color;
-    
-//     c.fillText(this.text,this.x,this.y);
-//     c.strokeStyle = 'white';
-//     c.strokeText(this.text,this.x,this.y);
-//     }
-// }
-
-// let timerMsg=new AllText(10,110,'10px Arial','white','PRESS B');
+class JetPack {
+    constructor (x,y,width,height,velocity){
+        this.x=x;
+        this.y=y;
+        this.width=width;
+        this.height=height;
+        this.velocity=velocity;
+    }
+    draw () {
+        c.drawImage(jetPack,this.x,this.y,this.width,this.height);
+    }
+    update () {
+        this.draw();
+        if(this.y+this.height>=canvas.height){
+            this.velocity.y=-this.velocity.y;
+        }
+        this.y+=this.velocity.y;
+        this.x+=this.velocity.x;
+    }
+}
 
 let bullets=[];
 let playerShoot=[];
@@ -584,10 +592,15 @@ addEventListener('keydown', (event) => {
             break;
         case 87:
             console.log('up');
-            if(player.velocity.y==0){
-                jumpSound.play();
-            player.velocity.y-=10;
-        }
+            if(!jetFlag){
+                if(player.velocity.y==0){
+                    jumpSound.play();
+                player.velocity.y-=10;
+            }
+            }
+            else if (jetFlag){
+                player.velocity.y-=10;
+            }
         break;
         case 66:
             console.log('bandages');
@@ -605,6 +618,12 @@ addEventListener('keydown', (event) => {
         case 50:
             gunChangeSound.play();
             gunChoice=2;
+            break;
+        case 74:
+            if(numOfJetPack>0){
+                jetFlag=true;
+                timingFunction(25,'not done');
+            }
             break;
     }
 });
@@ -674,6 +693,24 @@ else if (sec==15 && initialImmunity>0){
             return;
         }
     }
+    },1000);
+}
+else if(sec==25){
+    exactTime.style.visibility='visible';
+    exactTime.innerHTML="";
+    setInterval(()=>{
+        if(work=='not done'){
+            sec-=1;
+            exactTime.innerHTML=`JETPACK ENABLED FOR : ${sec} Seconds`;
+            if(sec==0){
+                exactTime.style.visibility='hidden';
+                jetFlag=false;
+                numOfJetPack--;
+                jetPacks.innerHTML=`x${numOfJetPack}`;
+                work='done';
+                return;
+            }
+        }
     },1000);
 }
 }
@@ -1004,6 +1041,29 @@ function spawnBullet() {
                 akmAmmo.innerHTML=`AMMO : ${akmAmmoCurr}`;
             }
         }
+        for(let i=0;i<jetPackArray.length;i++){
+            if(player.x<=jetPackArray[i].x+jetPackArray[i].width && player.x+player.width>=jetPackArray[i].x && player.y<=jetPackArray[i].y+jetPackArray[i].height && player.y+player.height>=jetPackArray[i].y){
+                jetPackArray.splice(i,1);
+                pickupSound.play();
+                numOfJetPack++;
+                jetPacks.innerHTML=`x${numOfJetPack}`;
+            }
+        }
+    }
+
+    function spawnJetPacks () {
+        setInterval(()=>{
+            let jetPacksProbability=Math.floor(Math.random()*10);
+            console.log(jetPacksProbability);
+            if(jetPacksProbability>7){
+                if(jetPacksProbability==8){
+                    jetPackArray.push(new JetPack(0,canvas.height*Math.random()-100,70,90,{x:2,y:2}));
+                }
+                else if (jetPacksProbability==9){
+                    jetPackArray.push(new JetPack(canvas.width,canvas.height*Math.random()-100,70,90,{x:-2,y:2}));
+                }
+        }
+        },5000);
     }
 
     function saveScore (score) {
@@ -1084,8 +1144,14 @@ function animate () {
     // timerMsg.draw();
     c.drawImage(bandage,10,10,70,70);
     c.drawImage(immune,10,90,70,70);
+    c.drawImage(jetPack,10,170,70,90);
     c.drawImage(shotGun,canvas.width-300,10,290,80);
     c.drawImage(machineGun,canvas.width-300,90,290,100);
+    if(jetPackArray.length>0){
+        for(let i=0;i<jetPackArray.length;i++){
+            jetPackArray[i].update();
+        }
+    }
     player.update();
     healthBar.forEach((bar)=>{
         bar.draw();
@@ -1125,6 +1191,11 @@ function animate () {
             playerShoot.splice(index,1);
         }
     });
+    jetPackArray.forEach((jets,jIndex)=>{
+        if(jets.x+jets.width<=0 || jets.x>=canvas.width || jets.y+jets.height<=0){
+            jetPackArray.splice(jIndex,1);
+        }
+    });
     playerBlockCollision();
     playerBulletToZombie();
     zombieBulletToPlayer();
@@ -1134,8 +1205,9 @@ function animate () {
     giftPlayerCollision();
 }
 spawnEnemies();
+spawnJetPacks();
 setTimeout(()=>{
-    spawnBullet();
-    machineGunBullet();
+    // spawnBullet();
+    // machineGunBullet();
 },200);
 animate();

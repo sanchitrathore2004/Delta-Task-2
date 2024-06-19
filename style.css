@@ -152,3 +152,19 @@ body{
     font-weight: bold;
     user-select: none;
 }
+.press-j{
+    color: white;
+    position: absolute;
+    margin-top: 230px;
+    margin-left: 110px;
+    user-select: none;
+}
+.jetpack{
+    color: white;
+    position: absolute;
+    font-size: x-large;
+    font-weight: bold;
+    margin-top: 225px;
+    margin-left: 80px;
+    user-select: none;
+}

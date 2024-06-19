@@ -115,6 +115,9 @@ let yourScore=document.querySelector('.score-of-player');
 let startBtn=document.querySelector(".start-btn");
 let startDialougeBox=document.querySelector(".start-game");
 let complete=document.querySelector(".complete");
+let instructionBtn=document.querySelector(".instructions");
+let instructionBox=document.querySelector('.instruction-box');
+let closeIns=document.querySelector('.close-instructions');
 console.log(closeLeaderboard);
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight-50;
@@ -123,6 +126,16 @@ loadScore();
 playAgain.addEventListener('click',function () {
     location.reload();
 });
+
+instructionBtn.addEventListener('click', function () {
+    instructionBox.style.visibility='visible';
+    startDialougeBox.style.visibility='hidden';
+});
+
+closeIns.addEventListener('click', function () {
+    instructionBox.style.visibility='hidden';
+    startDialougeBox.style.visibility='visible';
+})
 
 startBtn.addEventListener('click', function () {
     startDialougeBox.style.visibility='hidden';

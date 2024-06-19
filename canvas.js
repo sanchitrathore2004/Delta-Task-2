@@ -599,7 +599,7 @@ addEventListener('keydown', (event) => {
             }
             }
             else if (jetFlag){
-                player.velocity.y-=10;
+                player.velocity.y-=15;
             }
         break;
         case 66:
@@ -1207,7 +1207,7 @@ function animate () {
 spawnEnemies();
 spawnJetPacks();
 setTimeout(()=>{
-    spawnBullet();
-    machineGunBullet();
+    // spawnBullet();
+    // machineGunBullet();
 },200);
 animate();

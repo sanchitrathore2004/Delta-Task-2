@@ -109,10 +109,17 @@ let gameoverSound=document.querySelector('#gameover');
 let shotGunSound=document.querySelector('#shotgun');
 let emptygunSound=document.querySelector('#emptygun');
 let machinegunSound=document.querySelector('#machinegun');
+let endGame=document.querySelector(".end-game");
+let playAgain=document.querySelector(".reset-btn");
+let yourScore=document.querySelector('.score-of-player');
 console.log(closeLeaderboard);
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight-50;
 loadScore();
+
+playAgain.addEventListener('click',function () {
+    location.reload();
+});
 
 closeLeaderboard.addEventListener("click", function () {
     leader.style.visibility='hidden';
@@ -768,7 +775,8 @@ function zombieBulletToPlayer () {
             if(healthScore<=0){
                 saveScore(setScore);
                 gameoverSound.play();
-            alert('Game over');
+            endGame.style.visibility='visible';
+            yourScore.innerHTML=`SCORE : ${setScore}`;
             cancelAnimationFrame(animationFrameID);
 
         }
@@ -785,7 +793,8 @@ function zombieBulletToPlayer () {
             if(healthScore<=0){
                 gameoverSound.play();
                 saveScore(setScore);
-            alert('Game over');
+                endGame.style.visibility='visible';
+                yourScore.innerHTML=`SCORE : ${setScore}`;
             cancelAnimationFrame(animationFrameID);
 
         }
@@ -804,7 +813,8 @@ function zombieBulletToPlayer () {
             if(healthScore<=0){
                 gameoverSound.play();
                 saveScore(setScore);
-            alert('Game over');
+                endGame.style.visibility='visible';
+                yourScore.innerHTML=`SCORE : ${setScore}`;
             cancelAnimationFrame(animationFrameID);
             }
         }
@@ -820,7 +830,8 @@ function zombieBulletToPlayer () {
             if(healthScore<=0){
                 gameoverSound.play();
                 saveScore(setScore);
-            alert('Game over');
+                endGame.style.visibility='visible';
+                yourScore.innerHTML=`SCORE : ${setScore}`;
             cancelAnimationFrame(animationFrameID);
             }
         }
@@ -985,7 +996,8 @@ function spawnBullet() {
                 if(healthScore<=0){
                     gameoverSound.play();
                     saveScore(setScore);
-                    alert('game over');
+                    endGame.style.visibility='visible';
+                    yourScore.innerHTML=`SCORE : ${setScore}`;
                     cancelAnimationFrame(animationFrameID);
                 }
                 e.collisionStatus='collided';
@@ -999,7 +1011,8 @@ function spawnBullet() {
                 if(healthScore<=0){
                     gameoverSound.play();
                     saveScore(setScore);
-                    alert('game over');
+                    endGame.style.visibility='visible';
+                    yourScore.innerHTML=`SCORE : ${setScore}`;
                     cancelAnimationFrame(animationFrameID);
                 }
                 er.collisionStatus='collided';
@@ -1013,7 +1026,8 @@ function spawnBullet() {
                 if(healthScore<=0){
                     gameoverSound.play();
                     saveScore(setScore);
-                    alert('game over');
+                    endGame.style.visibility='visible';
+                    yourScore.innerHTML=`SCORE : ${setScore}`;
                     cancelAnimationFrame(animationFrameID);
                 }
                 zom.collisionStatus='collided';

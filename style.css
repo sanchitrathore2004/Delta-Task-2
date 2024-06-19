@@ -168,3 +168,48 @@ body{
     margin-left: 80px;
     user-select: none;
 }
+.end-game{
+    display: flex;
+    width: 90%;
+    height: 90%;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    visibility: hidden;
+}
+.end-game>div{
+    width: 50rem;
+    height: 30rem;
+    margin-left: 140px;
+    background-color: aliceblue;
+    border: 5px solid black;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+.btns{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: larger;
+    font-weight: bolder;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content: space-around;
+}
+.reset-btn,
+.score-of-player{
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.5s, color 0.5s, border-radius 0.5s ease;
+    cursor: pointer;
+}
+.reset-btn:hover{
+    background-color: black;
+    color: white;
+    border-radius: 5px;
+}

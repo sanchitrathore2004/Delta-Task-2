@@ -1221,7 +1221,7 @@ function animate () {
 spawnEnemies();
 spawnJetPacks();
 setTimeout(()=>{
-    // spawnBullet();
-    // machineGunBullet();
+    spawnBullet();
+    machineGunBullet();
 },200);
 animate();

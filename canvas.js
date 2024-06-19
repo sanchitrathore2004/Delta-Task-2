@@ -112,6 +112,9 @@ let machinegunSound=document.querySelector('#machinegun');
 let endGame=document.querySelector(".end-game");
 let playAgain=document.querySelector(".reset-btn");
 let yourScore=document.querySelector('.score-of-player');
+let startBtn=document.querySelector(".start-btn");
+let startDialougeBox=document.querySelector(".start-game");
+let complete=document.querySelector(".complete");
 console.log(closeLeaderboard);
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight-50;
@@ -119,6 +122,12 @@ loadScore();
 
 playAgain.addEventListener('click',function () {
     location.reload();
+});
+
+startBtn.addEventListener('click', function () {
+    startDialougeBox.style.visibility='hidden';
+    complete.style.visibility='visible';
+    animate();
 });
 
 closeLeaderboard.addEventListener("click", function () {
@@ -1224,4 +1233,3 @@ setTimeout(()=>{
     spawnBullet();
     machineGunBullet();
 },200);
-animate();

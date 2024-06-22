@@ -128,6 +128,8 @@ let gunZombieFlag=false;
 let numOfMines=3;
 let showMines=document.querySelector(".mines");
 let preperationTime='not over';
+let mineExplosion=document.querySelector("#mine");
+let detonateMine=document.querySelector("#detonate");
 console.log(closeLeaderboard);
 canvas.width=window.innerWidth-15;
 canvas.height=window.innerHeight-50;
@@ -693,6 +695,7 @@ addEventListener('keydown', (event) => {
             break;
         case 77:
             if(numOfMines>0 && preperationTime=='not over'){
+            detonateMine.play();
             mineFlag=true;
             mineX.push(player.x);
             mineY.push(player.y);
@@ -1150,6 +1153,42 @@ function spawnBullet() {
         }
     }
 
+    function mineZombieCollision () {
+        for(let i=0;i<mineX.length;i++){
+            enemy.forEach((e,eIndex)=>{
+                if(e.x+e.width>=mineX[i] && e.x<=mineX[i]+100 && e.y+e.height>=mineY[i] && e.y<=mineY[i]+50){
+                    mineExplosion.play();
+                    mineX.splice(i,1);
+                    mineY.splice(i,1);
+                    enemy.splice(eIndex,1);
+                    setScore+=100;
+                    points.innerHTML=setScore;
+                }
+            });
+            enemyRight.forEach((er,erIndex)=>{
+                if(er.x<=mineX[i]+100 && er.x+er.width>=mineX[i] && er.y+er.height>=mineY[i] && er.y<=mineY[i]+50){
+                    mineExplosion.play();
+                    mineX.splice(i,1);
+                    mineY.splice(i,1);
+                    enemyRight.splice(erIndex,1);
+                    setScore+=100;
+                    points.innerHTML=setScore;
+                }
+            });
+            machineGunZombies.forEach((mgz,mgzIndex)=>{
+                if(mgz.x<=mineX[i]+100 && mgz.x+mgz.width>=mineX[i] && mgz.y+mgz.height>=mineY[i] && mgz.y<=mineY[i]+50){
+                    mineExplosion.play();
+                    mineX.splice(i,1);
+                    mineY.splice(i,1);
+                    machineGunZombies.splice(mgzIndex,1);
+                    healthBar.splice(mgzIndex,1);
+                    setScore+=200;
+                    points.innerHTML=setScore;
+                }
+            });
+        }
+    }
+
     function spawnJetPacks () {
         setInterval(()=>{
             let jetPacksProbability=Math.floor(Math.random()*10);
@@ -1316,4 +1355,5 @@ function animate () {
     zombiePlayerCollision();
     healthOfMachineZombies();
     giftPlayerCollision();
+    mineZombieCollision();
 }

@@ -156,8 +156,8 @@ startBtn.addEventListener('click', function () {
         gunZombieFlag=true;
     },30000);
     setTimeout(()=>{
-        // spawnBullet();
-        // machineGunBullet();
+        spawnBullet();
+        machineGunBullet();
     },32000);
     timingFunction(30,'not done');
     animate();

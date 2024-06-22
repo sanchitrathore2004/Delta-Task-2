@@ -131,7 +131,7 @@ let preperationTime='not over';
 let mineExplosion=document.querySelector("#mine");
 let detonateMine=document.querySelector("#detonate");
 console.log(closeLeaderboard);
-canvas.width=window.innerWidth-15;
+canvas.width=window.innerWidth;
 canvas.height=window.innerHeight-50;
 loadScore();
 
@@ -231,8 +231,9 @@ class Player{
         else if(this.y+this.height>=canvas.height){
             this.velocity.y=0;
         }
-        if(this.y<=0){
+        if(this.y<=10){
             this.velocity.y=-this.velocity.y*0.7;
+            this.y+=20;
         }
     }
 }
@@ -618,7 +619,7 @@ addEventListener('click', (event) => {
     playerShoot.push(new PlayerBullet(player.x+100,player.y+50,10,'pink',velocity,false));
 }
 });
-addEventListener('mousedown',(event) => {
+addEventListener('click',(event) => {
     if(gunChoice==2 && akmAmmoCurr>0){
         machinegunSound.play();
     let intervalID=setInterval(()=>{
@@ -629,9 +630,11 @@ addEventListener('mousedown',(event) => {
         x:Math.cos(angle)*speed,
         y:Math.sin(angle)*speed
     }
+    if(akmAmmoCurr>0){
     akmAmmoCurr--;
     akmAmmo.innerHTML=`AMMO : ${akmAmmoCurr}`;
     playerShoot.push(new PlayerBullet(player.x+100,player.y+50,10,'pink',velocity,false));
+}
     },100);
     setTimeout(()=>{
         clearInterval(intervalID);
@@ -667,7 +670,7 @@ addEventListener('keydown', (event) => {
             }
             }
             else if (jetFlag){
-                player.velocity.y-=15;
+                player.velocity.y-=10;
             }
         break;
         case 66:

@@ -47,6 +47,9 @@ ammo.src='./ammo.png';
 const jetPack=new Image();
 jetPack.src='./jetpack.png';
 
+const mine=new Image();
+mine.src='./mine.png';
+
 function drawBackground() {
     c.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 }
@@ -118,8 +121,15 @@ let complete=document.querySelector(".complete");
 let instructionBtn=document.querySelector(".instructions");
 let instructionBox=document.querySelector('.instruction-box');
 let closeIns=document.querySelector('.close-instructions');
+let mineX=[];
+let mineY=[];
+let mineFlag=false;
+let gunZombieFlag=false;
+let numOfMines=3;
+let showMines=document.querySelector(".mines");
+let preperationTime='not over';
 console.log(closeLeaderboard);
-canvas.width=window.innerWidth;
+canvas.width=window.innerWidth-15;
 canvas.height=window.innerHeight-50;
 loadScore();
 
@@ -140,6 +150,16 @@ closeIns.addEventListener('click', function () {
 startBtn.addEventListener('click', function () {
     startDialougeBox.style.visibility='hidden';
     complete.style.visibility='visible';
+    setTimeout(()=>{
+        spawnEnemies();
+        spawnJetPacks();
+        gunZombieFlag=true;
+    },30000);
+    setTimeout(()=>{
+        // spawnBullet();
+        // machineGunBullet();
+    },32000);
+    timingFunction(30,'not done');
     animate();
 });
 
@@ -500,11 +520,28 @@ class JetPack {
     }
 }
 
+class Inventory {
+    constructor(x,y,width,height,image){
+        this.x=x;
+        this.y=y;
+        this.width=width;
+        this.height=height;
+        this.image=image;
+    }
+    draw(){
+        c.drawImage(mine,this.x,this.y,this.width,this.height);
+    }
+    update(){
+        this.draw();
+    }
+}
+
 let bullets=[];
 let playerShoot=[];
 let machineGunZombies=[];
 let arrivingZombies=[];
 let healthBar=[];
+let inventory=[new Inventory(15,270,60,60,mine)];
 machineGunZombies.push(new Zombies(canvas.width,canvas.height-100,100,100,{x:-1,y:null},'pink','right'));
 machineGunZombies.push(new Zombies(0,canvas.height-100,100,100,{x:1,y:null},'pink','left'));
 healthBar.push(new HealthBar(machineGunZombies[0].x,machineGunZombies[0].y-25,100,20,machineGunZombies[0].velocity,'red',100,100,'right'));
@@ -654,6 +691,15 @@ addEventListener('keydown', (event) => {
                 timingFunction(25,'not done');
             }
             break;
+        case 77:
+            if(numOfMines>0 && preperationTime=='not over'){
+            mineFlag=true;
+            mineX.push(player.x);
+            mineY.push(player.y);
+            numOfMines--;
+            showMines.innerHTML=`x${numOfMines}`;
+        }
+            break;
     }
 });
 
@@ -737,6 +783,23 @@ else if(sec==25){
                 numOfJetPack--;
                 jetPacks.innerHTML=`x${numOfJetPack}`;
                 work='done';
+                return;
+            }
+        }
+    },1000);
+}
+else if(sec==30){
+    exactTime.style.visibility='visible';
+    exactTime.innerHTML="";
+    setInterval(()=>{
+        if(work=='not done'){
+            sec-=1;
+            exactTime.innerHTML=`PREPERATION TIME WILL END IN : ${sec} Seconds`;
+            if(sec==0){
+                exactTime.style.visibility='hidden';
+                mineFlag=false;
+                work='done';
+                preperationTime='over';
                 return;
             }
         }
@@ -1175,7 +1238,9 @@ function animate () {
         enemyRight[i].update();
     }
     for(let i=0;i<machineGunZombies.length;i++){
-        machineGunZombies[i].update();
+        if(gunZombieFlag){
+            machineGunZombies[i].update();
+        }
     }
     // timerMsg.draw();
     c.drawImage(bandage,10,10,70,70);
@@ -1188,10 +1253,22 @@ function animate () {
             jetPackArray[i].update();
         }
     }
+    if(inventory.length>0){
+        for(let i=0;i<inventory.length;i++){
+            inventory[i].update();
+        }
+    }
     player.update();
+    if(mineX.length>0){
+        for(let i=0;i<mineX.length;i++){
+            c.drawImage(mine,mineX[i],mineY[i]+50,100,50);
+        }
+    }
     healthBar.forEach((bar)=>{
+        if(gunZombieFlag){
         bar.draw();
         bar.update();
+    }
     });
     machinGun.forEach((gun)=>{
         gun.update();
@@ -1240,9 +1317,3 @@ function animate () {
     healthOfMachineZombies();
     giftPlayerCollision();
 }
-spawnEnemies();
-spawnJetPacks();
-setTimeout(()=>{
-    spawnBullet();
-    machineGunBullet();
-},200);

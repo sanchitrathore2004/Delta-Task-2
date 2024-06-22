@@ -162,12 +162,28 @@ body{
     margin-left: 110px;
     user-select: none;
 }
+.press-m{
+    color: white;
+    position: absolute;
+    margin-top: 300px;
+    margin-left: 110px;
+    user-select: none;
+}
 .jetpack{
     color: white;
     position: absolute;
     font-size: x-large;
     font-weight: bold;
     margin-top: 225px;
+    margin-left: 80px;
+    user-select: none;
+}
+.mines{
+    color: white;
+    position: absolute;
+    font-size: x-large;
+    font-weight: bold;
+    margin-top: 295px;
     margin-left: 80px;
     user-select: none;
 }

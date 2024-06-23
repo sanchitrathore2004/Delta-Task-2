@@ -141,6 +141,8 @@ let showBlades=document.querySelector('.blades');
 let bladeFlag=false;
 let bladeX=[];
 let bladeY=[];
+let cutSound=document.querySelector('#cut');
+let drawBlade=document.querySelector("#draw");
 console.log(closeLeaderboard);
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight-50;
@@ -584,7 +586,7 @@ let playerShoot=[];
 let machineGunZombies=[];
 let arrivingZombies=[];
 let healthBar=[];
-let inventory=[new Inventory(15,270,60,60,mine),new Inventory(200,10,100,90,blade)];
+let inventory=[new Inventory(15,270,60,60,mine),new Inventory(200,15,100,70,blade)];
 machineGunZombies.push(new Zombies(canvas.width,canvas.height-100,100,100,{x:-1,y:null},'pink','right','not collided'));
 machineGunZombies.push(new Zombies(0,canvas.height-100,100,100,{x:1,y:null},'pink','left','not collided'));
 healthBar.push(new HealthBar(machineGunZombies[0].x,machineGunZombies[0].y-25,100,20,machineGunZombies[0].velocity,'red',100,100,'right'));
@@ -761,15 +763,22 @@ addEventListener('keydown', (event) => {
             numOfMines--;
             showMines.innerHTML=`x${numOfMines}`;
         }
+        else if (preperationTime=='over'){
+            timingFunction(3,'not done');
+        }
             break;
         case 75:
             if(numOfBlades>0 && preperationTime=='not over'){
+                drawBlade.play();
                 bladeFlag=true;
                 bladeX.push(player.x);
                 bladeY.push(player.y);
                 bladesArray.push(new Mines(bladeX.slice(-1)[0],bladeY.slice(-1)[0],120,90,{x:0,y:0},blade));
                 numOfBlades--;
                 showBlades.innerHTML=`x${numOfBlades}`;
+            }
+            else if (preperationTime=='over'){
+                timingFunction(3,'not done');
             }
             break;
     }
@@ -872,6 +881,21 @@ else if(sec==30){
                 mineFlag=false;
                 work='done';
                 preperationTime='over';
+                return;
+            }
+        }
+    },1000);
+}
+else if (sec==3){
+    exactTime.style.visibility='visible';
+    exactTime.innerHTML="";
+    setInterval(()=>{
+        if(work=='not done'){
+            sec-=1;
+            exactTime.innerHTML=`PREPERATION TIME HAS ENDED`;
+            if(sec==0){
+                exactTime.style.visibility='hidden';
+                work='done';
                 return;
             }
         }
@@ -1267,7 +1291,7 @@ function spawnBullet() {
         for(let i=0;i<bladeX.length;i++){
             enemy.forEach((e,eIndex)=>{
                 if(e.x+e.width>=bladeX[i] && e.x<=bladeX[i]+100 && e.y+e.height>=bladeY[i] && e.y<=bladeY[i]+50){
-                    mineExplosion.play();
+                    cutSound.play();
                     bladeX.splice(i,1);
                     bladeY.splice(i,1);
                     bladesArray.splice(i,1);
@@ -1278,7 +1302,7 @@ function spawnBullet() {
             });
             enemyRight.forEach((er,erIndex)=>{
                 if(er.x<=bladeX[i]+100 && er.x+er.width>=bladeX[i] && er.y+er.height>=bladeY[i] && er.y<=bladeY[i]+50){
-                    mineExplosion.play();
+                    cutSound.play();
                     bladeX.splice(i,1);
                      bladeY.splice(i,1);
                      bladesArray.splice(i,1);
@@ -1289,7 +1313,7 @@ function spawnBullet() {
             });
             machineGunZombies.forEach((mgz,mgzIndex)=>{
                 if(mgz.x<=bladeX[i]+100 && mgz.x+mgz.width>=bladeX[i] && mgz.y+mgz.height>=bladeY[i] && mgz.y<=bladeY[i]+50){
-                    mineExplosion.play();
+                    cutSound.play();
                     bladeX.splice(i,1);
                      bladeY.splice(i,1);
                      bladesArray.splice(i,1);

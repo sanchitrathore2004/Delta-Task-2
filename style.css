@@ -276,7 +276,7 @@ body{
 .details{
     background-color: aqua;
     width: 20rem;
-    height: 20rem;
+    height: 25rem;
     padding: 10px;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     text-align: center;
@@ -287,6 +287,7 @@ body{
     padding: 10px;
     margin-top: 15px;
     cursor: pointer;
+    background-color: rgb(202, 92, 92);
     transition: background-color 0.5s,color 0.5s,border 0.5s, border-radius 0.5s ease;
 }
 .close-instructions:hover{

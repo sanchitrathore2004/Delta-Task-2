@@ -18,10 +18,10 @@ const obstacles = new Image();
 obstacles.src='./obstacles.png';
 
 const pillar=new Image();
-pillar.src='./pillarnobg.png';
+pillar.src='./pillar3.png';
 
 const plank=new Image();
-plank.src='./plank.png';
+plank.src='./plank3.png';
 
 const gunZombie=new Image();
 gunZombie.src='./machine gun zombie 2.png';
@@ -73,6 +73,7 @@ let standOn=[];
 let platforms=[];
 let enemy=[];
 let enemyRight=[];
+let machinGun=[];
 let animationFrameID;
 let resetBtn=document.querySelector(".reset");
 let scoreArray=[];
@@ -160,7 +161,7 @@ startBtn.addEventListener('click', function () {
     setTimeout(()=>{
         spawnBullet();
         machineGunBullet();
-    },32000);
+    },34000);
     timingFunction(30,'not done');
     animate();
 });
@@ -279,10 +280,10 @@ class Platform{
         }
     
             draw() {
-                c.beginPath();
-                c.fillStyle=this.color;
-                c.fillRect(this.x,this.y,this.width,this.height);
-                // c.drawImage(pillar,this.x,this.y,this.width,this.height);
+                // c.beginPath();
+                // c.fillStyle=this.color;
+                // c.fillRect(this.x,this.y,this.width,this.height);
+                c.drawImage(pillar,this.x,this.y,this.width,this.height);
             }
     
             update() {
@@ -301,10 +302,10 @@ class Platform{
             }
         
                 draw() {
-                    c.beginPath();
-                    c.fillStyle=this.color;
-                    c.fillRect(this.x,this.y,this.width,this.height);
-                    // c.drawImage(plank,this.x,this.y,this.width,this.height);
+                    // c.beginPath();
+                    // c.fillStyle=this.color;
+                    // c.fillRect(this.x,this.y,this.width,this.height);
+                    c.drawImage(plank,this.x,this.y,this.width,this.height);
                 }
         
                 update() {
@@ -335,7 +336,7 @@ class Enemy{
         if(this.y+this.height<=canvas.height){
             this.velocity.y+=gravity;
         }
-        if(this.y+this.height+50>=canvas.height){
+        if(this.y+this.height+20>=canvas.height){
             this.velocity.y=0;
         }
         if(this.x<canvas.width/2){
@@ -362,7 +363,10 @@ class Enemy{
                         }
                     }
                 }
-                if(this.y+this.height+25<=platform.y){
+                // if(this.y+this.height+25<=platform.y){
+                //     this.velocity.y=0;
+                // }
+                if(this.x+this.width>=platform.x && this.x<=platform.x+platform.width && this.y+this.height<=platform.y){
                     this.velocity.y=0;
                 }
             });
@@ -580,12 +584,12 @@ else return;
 }
 
 let player=new Player(canvas.width/2,canvas.height/2,100,100,'red');
-let platform1=new Plank(canvas.width/2,4*canvas.height/5,20,200,'blue');
-let platform2=new Pillar(canvas.width/3,canvas.height-200,200,40,'blue');
-let platform3=new Pillar(2*canvas.width/3,canvas.height-200,200,40,'blue');
-let platform3a=new Plank(canvas.width/3+2*player.width,8*canvas.height/9,20,200,'blue');
-let platform3c=new Plank(canvas.width/8,2*canvas.height/3,20,200,'blue');
-let platform3d=new Plank(3*canvas.width/4,2*canvas.height/3-50,20,200,'blue');
+let platform1=new Plank(canvas.width/2,4*canvas.height/5,40,200,'blue');
+let platform2=new Pillar(canvas.width/3,canvas.height-200,200,90,'blue');
+let platform3=new Pillar(2*canvas.width/3,canvas.height-200,200,90,'blue');
+let platform3a=new Plank(canvas.width/3+2*player.width,8*canvas.height/9,40,200,'blue');
+let platform3c=new Plank(canvas.width/8,2*canvas.height/3,40,200,'blue');
+let platform3d=new Plank(3*canvas.width/4,2*canvas.height/3-50,40,200,'blue');
 
 standOn=[platform1,platform2,platform3,platform3a,platform3c,platform3d];
 
@@ -851,6 +855,14 @@ function zombieBulletToObstacle() {
             }
         });
     });
+    machinGun.forEach((m,mIndex)=>{
+        platforms.forEach((plat,platIndex)=>{
+            if(m.x+m.radius>=plat.x && m.x-m.radius<=plat.x+plat.width && m.y+m.radius>=plat.y && m.y-m.radius<=plat.y+plat.height){
+                platforms.splice(platIndex,1);
+                machinGun.splice(mIndex,1);
+            }
+        });
+    });
 }
 
 function zombieBulletToPlayer () {
@@ -1036,21 +1048,15 @@ function spawnBullet() {
                     y:null
                 }
             }
-            if(bulletPosition[aIndex].y+bulletPosition[aIndex].height+50<canvas.height){
             bullets.push(new Bullet(arrivingZombies[aIndex].x+arrivingZombies[aIndex].width,arrivingZombies[aIndex].y+arrivingZombies[aIndex].height*Math.random(),10,'black',velocity));
-        }
 
             return;
         }
         else{
-            if(bulletPosition[index].y+bulletPosition[index].height+50<canvas.height){
         bullets.push(new Bullet(bulletPosition[index].x+bulletPosition[index].width, bulletPosition[index].y+bulletPosition[index].height*Math.random(), 10, 'black',velocity));
-    }
     }
     }, 2000);
     }
-
-    let machinGun=[];
 
     function machineGunBullet () {
         setInterval(()=>{
@@ -1249,11 +1255,7 @@ function animate () {
     standOn.forEach((stand)=>{
         stand.draw();
     });
-    for(let i=0;i<platforms.length;i++){
-        if(platforms[i]){
-        platforms[i].update();
-    }
-    }
+   
     if(giftFlag){
         for(let i=0;i<giftX.length;i++)
             {
@@ -1278,6 +1280,11 @@ function animate () {
     }
     for(let i=0;i<enemyRight.length;i++){
         enemyRight[i].update();
+    }
+    for(let i=0;i<platforms.length;i++){
+        if(platforms[i]){
+        platforms[i].update();
+    }
     }
     for(let i=0;i<machineGunZombies.length;i++){
         if(gunZombieFlag){

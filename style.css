@@ -124,6 +124,13 @@ body{
     margin-left: 110px;
     user-select: none;
 }
+.press-k{
+    color: white;
+    position: absolute;
+    margin-top: 65px;
+    margin-left: 335px;
+    user-select: none;
+}
 .press-1{
     color: white;
     position: absolute;
@@ -186,6 +193,15 @@ body{
     font-weight: bold;
     margin-top: 295px;
     margin-left: 80px;
+    user-select: none;
+}
+.blades{
+    color: white;
+    position: absolute;
+    font-size: x-large;
+    font-weight: bold;
+    margin-top: 60px;
+    margin-left: 305px;
     user-select: none;
 }
 .end-game{

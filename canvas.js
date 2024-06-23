@@ -50,6 +50,9 @@ jetPack.src='./jetpack.png';
 const mine=new Image();
 mine.src='./mine.png';
 
+const blade=new Image();
+blade.src='./blade.png';
+
 function drawBackground() {
     c.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 }
@@ -74,6 +77,7 @@ let platforms=[];
 let enemy=[];
 let enemyRight=[];
 let machinGun=[];
+let minesArray=[];
 let animationFrameID;
 let resetBtn=document.querySelector(".reset");
 let scoreArray=[];
@@ -131,6 +135,12 @@ let showMines=document.querySelector(".mines");
 let preperationTime='not over';
 let mineExplosion=document.querySelector("#mine");
 let detonateMine=document.querySelector("#detonate");
+let bladesArray=[];
+let numOfBlades=2;
+let showBlades=document.querySelector('.blades');
+let bladeFlag=false;
+let bladeX=[];
+let bladeY=[];
 console.log(closeLeaderboard);
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight-50;
@@ -148,7 +158,7 @@ instructionBtn.addEventListener('click', function () {
 closeIns.addEventListener('click', function () {
     instructionBox.style.visibility='hidden';
     startDialougeBox.style.visibility='visible';
-})
+});
 
 startBtn.addEventListener('click', function () {
     startDialougeBox.style.visibility='hidden';
@@ -161,7 +171,7 @@ startBtn.addEventListener('click', function () {
     setTimeout(()=>{
         spawnBullet();
         machineGunBullet();
-    },34000);
+    },38000);
     timingFunction(30,'not done');
     animate();
 });
@@ -536,10 +546,36 @@ class Inventory {
         this.image=image;
     }
     draw(){
-        c.drawImage(mine,this.x,this.y,this.width,this.height);
+        c.drawImage(this.image,this.x,this.y,this.width,this.height);
     }
     update(){
         this.draw();
+    }
+}
+class Mines {
+    constructor (x,y,width,height,velocity,image){
+        this.x=x;
+        this.y=y;
+        this.width=width;
+        this.height=height;
+        this.velocity=velocity;
+        this.image=image;
+    }
+    draw(){
+        c.drawImage(this.image,this.x,this.y,this.width,this.height);
+    }
+    update () {
+        this.draw();
+        this.velocity.y+=gravity;
+        platforms.forEach(plat=>{
+            if(this.x+this.width>=plat.x && this.x<=plat.x+plat.width && this.y+this.height-10>=plat.y && this.y<=plat.y+plat.height){
+                this.velocity.y=0;
+            }
+            if(this.y+this.height>=canvas.height){
+                this.velocity.y=0;
+            }
+        });
+        this.y+=this.velocity.y;
     }
 }
 
@@ -548,9 +584,9 @@ let playerShoot=[];
 let machineGunZombies=[];
 let arrivingZombies=[];
 let healthBar=[];
-let inventory=[new Inventory(15,270,60,60,mine)];
-machineGunZombies.push(new Zombies(canvas.width,canvas.height-100,100,100,{x:-1,y:null},'pink','right'));
-machineGunZombies.push(new Zombies(0,canvas.height-100,100,100,{x:1,y:null},'pink','left'));
+let inventory=[new Inventory(15,270,60,60,mine),new Inventory(200,10,100,90,blade)];
+machineGunZombies.push(new Zombies(canvas.width,canvas.height-100,100,100,{x:-1,y:null},'pink','right','not collided'));
+machineGunZombies.push(new Zombies(0,canvas.height-100,100,100,{x:1,y:null},'pink','left','not collided'));
 healthBar.push(new HealthBar(machineGunZombies[0].x,machineGunZombies[0].y-25,100,20,machineGunZombies[0].velocity,'red',100,100,'right'));
 healthBar.push(new HealthBar(machineGunZombies[1].x,machineGunZombies[1].y-25,100,20,machineGunZombies[1].velocity,'red',100,100,'left'));
 function reSpawnGunZombies () {
@@ -619,7 +655,14 @@ addEventListener('click', (event) => {
         x:Math.cos(angle)*speed,
         y:Math.sin(angle)*speed
     }
-    // shotGunSound.play();
+    if(event.clientX>player.x){
+        player.x-=10;
+        player.face=player.direction.right;
+    }
+    else if(event.clientX<player.x){
+        player.face=player.direction.left;
+        player.x+=10;
+    }
     playerShoot.push(new PlayerBullet(player.x+100,player.y+50,10,'pink',velocity,false));
 }
 });
@@ -637,6 +680,14 @@ addEventListener('click',(event) => {
     if(akmAmmoCurr>0){
     akmAmmoCurr--;
     akmAmmo.innerHTML=`AMMO : ${akmAmmoCurr}`;
+    if(event.clientX>player.x){
+        player.face=player.direction.right;
+        player.x-=7;
+    }
+    else if(event.clientX<player.x){
+        player.face=player.direction.left;
+        player.x+=7;
+    }
     playerShoot.push(new PlayerBullet(player.x+100,player.y+50,10,'pink',velocity,false));
 }
     },100);
@@ -706,9 +757,20 @@ addEventListener('keydown', (event) => {
             mineFlag=true;
             mineX.push(player.x);
             mineY.push(player.y);
+            minesArray.push(new Mines(mineX.slice(-1)[0],mineY.slice(-1)[0]+50,100,50,{x:0,y:0},mine));
             numOfMines--;
             showMines.innerHTML=`x${numOfMines}`;
         }
+            break;
+        case 75:
+            if(numOfBlades>0 && preperationTime=='not over'){
+                bladeFlag=true;
+                bladeX.push(player.x);
+                bladeY.push(player.y);
+                bladesArray.push(new Mines(bladeX.slice(-1)[0],bladeY.slice(-1)[0],120,90,{x:0,y:0},blade));
+                numOfBlades--;
+                showBlades.innerHTML=`x${numOfBlades}`;
+            }
             break;
     }
 });
@@ -1169,6 +1231,7 @@ function spawnBullet() {
                     mineExplosion.play();
                     mineX.splice(i,1);
                     mineY.splice(i,1);
+                    minesArray.splice(i,1);
                     enemy.splice(eIndex,1);
                     setScore+=100;
                     points.innerHTML=setScore;
@@ -1179,6 +1242,7 @@ function spawnBullet() {
                     mineExplosion.play();
                     mineX.splice(i,1);
                     mineY.splice(i,1);
+                    minesArray.splice(i,1);
                     enemyRight.splice(erIndex,1);
                     setScore+=100;
                     points.innerHTML=setScore;
@@ -1189,6 +1253,46 @@ function spawnBullet() {
                     mineExplosion.play();
                     mineX.splice(i,1);
                     mineY.splice(i,1);
+                    minesArray.splice(i,1);
+                    machineGunZombies.splice(mgzIndex,1);
+                    healthBar.splice(mgzIndex,1);
+                    setScore+=200;
+                    points.innerHTML=setScore;
+                }
+            });
+        }
+    }
+
+    function bladeZombieCollision () {
+        for(let i=0;i<bladeX.length;i++){
+            enemy.forEach((e,eIndex)=>{
+                if(e.x+e.width>=bladeX[i] && e.x<=bladeX[i]+100 && e.y+e.height>=bladeY[i] && e.y<=bladeY[i]+50){
+                    mineExplosion.play();
+                    bladeX.splice(i,1);
+                    bladeY.splice(i,1);
+                    bladesArray.splice(i,1);
+                    enemy.splice(eIndex,1);
+                    setScore+=100;
+                    points.innerHTML=setScore;
+                }
+            });
+            enemyRight.forEach((er,erIndex)=>{
+                if(er.x<=bladeX[i]+100 && er.x+er.width>=bladeX[i] && er.y+er.height>=bladeY[i] && er.y<=bladeY[i]+50){
+                    mineExplosion.play();
+                    bladeX.splice(i,1);
+                     bladeY.splice(i,1);
+                     bladesArray.splice(i,1);
+                    enemyRight.splice(erIndex,1);
+                    setScore+=100;
+                    points.innerHTML=setScore;
+                }
+            });
+            machineGunZombies.forEach((mgz,mgzIndex)=>{
+                if(mgz.x<=bladeX[i]+100 && mgz.x+mgz.width>=bladeX[i] && mgz.y+mgz.height>=bladeY[i] && mgz.y<=bladeY[i]+50){
+                    mineExplosion.play();
+                    bladeX.splice(i,1);
+                     bladeY.splice(i,1);
+                     bladesArray.splice(i,1);
                     machineGunZombies.splice(mgzIndex,1);
                     healthBar.splice(mgzIndex,1);
                     setScore+=200;
@@ -1308,9 +1412,14 @@ function animate () {
         }
     }
     player.update();
-    if(mineX.length>0){
-        for(let i=0;i<mineX.length;i++){
-            c.drawImage(mine,mineX[i],mineY[i]+50,100,50);
+    if(minesArray.length>0){
+        for(let i=0;i<minesArray.length;i++){
+            minesArray[i].update();
+        }
+    }
+    if(bladesArray.length>0){
+        for(let i=0;i<bladesArray.length;i++){
+            bladesArray[i].update();
         }
     }
     healthBar.forEach((bar)=>{
@@ -1366,4 +1475,5 @@ function animate () {
     healthOfMachineZombies();
     giftPlayerCollision();
     mineZombieCollision();
+    bladeZombieCollision();
 }
